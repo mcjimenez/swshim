@@ -45,10 +45,14 @@
   // This should be in navigator_connect_shim_svr.js
   // When iac message is received this has to be executed
   var sendMessage = function () {
-    navigator.serviceWorker.postMessage({
-      isFromIAC: true,
-      data: "Hello from the main thread!",
-      count: count++
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(reg => {
+        reg.active && reg.active.postMessage({
+          isFromIAC: true,
+          data: "Hello from the main thread!",
+          count: count++
+        });
+      });
     });
   };
 
