@@ -13,11 +13,13 @@ console.log('CJC - SWSHIM myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES N
   }
 
   function extractDataFromMessage(data) {
-    return data;
+    if (data.detail) {
+      console.log("CJC - SWSHIM - data.detail: " + JSON.stringify(data.detail));
+    }
+    return data.detail;
   }
 
-  var previousOnMessage = sw.onmessage;
-  sw.onmessage = function(messageData) {
+  sw.addEventListener('message', function(messageData) {
     console.log('CJC - SWSHIM - got a message: ' + JSON.stringify(messageData));
     if (isFromIAC(messageData)) {
       // El mensaje viene de IAC o sea que será crossorigin:
@@ -25,9 +27,12 @@ console.log('CJC - SWSHIM myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES N
       if (sw.oncrossoriginconnect && typeof sw.oncrossoriginconnect == "function") {
         sw.oncrossoriginconnect(data);
       }
-    } else if (previousOnMessage && typeof previousOnMessage == "function") {
+    }/*
+      If there was a previously event putted this addEventListener
+      simply will be ignored
+      else if (previousOnMessage && typeof previousOnMessage == "function") {
       // Igual no venia de IAC sino de lo que haga la app normalmente
       previousOnMessage(messageData);
-    }
-  };
+    }*/
+  });
 })(self || myServiceWorker);
