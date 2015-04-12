@@ -12,15 +12,8 @@ console.log('CJC - SWSHIM myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES N
     return true;
   }
 
-  function extractDataFromMessage(data) {
-    for (var kk in data) {
-      console.log("CJC extractDataFromMessage --> "+kk+":"+JSON.stringify(data[kk]));
-    }
-
-    if (data.detail) {
-      console.log("CJC - SWSHIM - data.detail: " + JSON.stringify(data.detail));
-    }
-    return data.detail;
+  function extractDataFromMessage(evt) {
+    return evt.data || {};
   }
 
   sw.addEventListener('message', function(messageData) {
