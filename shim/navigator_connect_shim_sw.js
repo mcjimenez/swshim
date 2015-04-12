@@ -34,6 +34,8 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     var returnedMessage = evt.data.dataToSend;
     if (evt.data.isConnectionRequest) {
       returnedMessage.targetURL="We have to copy the origin URL here";
+      // El handler al que llamemos pondrá un onmessage aqui, que tendremos que guardar con cariño para pasarle los mensajes...
+      // (en el else que no está hecho)
       returnedMessage.source = {
         postMessage: msg => {
           sw.postMessage({uuid: evt.data.uuid, data: msg});
@@ -64,7 +66,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // El mensaje viene de IAC o sea que será crossorigin:
       var data = extractDataFromMessage(messageData);
       if (sw.onconnect && typeof sw.onconnect == "function") {
-        sw.oncrossoriginconnect(data);
+        sw.onconnect(data);
       }
     }/*
       If there was a previously event putted this addEventListener
