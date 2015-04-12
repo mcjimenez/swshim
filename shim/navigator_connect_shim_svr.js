@@ -88,7 +88,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // will in turn trigger the onmessage handler on messageChannel.port1.
         // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
         debug('sending message ' + (reg.active?' reg active':'reg NO active'));
-        debug('Port2:' + (messageChannel.port2 ? ' exists': ' not exists'));
+//        debug('Port2:' + (messageChannel.port2 ? ' exists': ' not exists'));
         // According to the sample it should be:
         //        reg.active && reg.active.postMessage(message, [messageChannel.port2]);
         // But that doesn't work on Gecko (https://bugzilla.mozilla.org/show_bug.cgi?id=677638#c62)...
