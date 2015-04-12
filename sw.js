@@ -21,7 +21,7 @@ this.addEventListener('activate', function(evt) {
 this.addEventListener('fetch', function(evt) {
   debug('fetch event');
 });
-
+/*
 this.addEventListener('message', function(evt) {
   debug("got a message!");
 });
@@ -29,7 +29,7 @@ this.addEventListener('message', function(evt) {
 this.onmessage = function(message) {
   debug("Got a message, second method!");
 };
-
+*/
 this.oncrossoriginconnect = function(msg) {
   debug("oncrossoriginconnect event");
 /*
