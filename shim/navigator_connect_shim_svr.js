@@ -24,7 +24,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // This should be in navigator_connect_shim_svr.js
   // When iac connection message is received this has to be executed
   var sendConnectionMessage = function () {
-    debug('sendConnectionMessage!!');
+    debug('sendConnectionMessage...');
     navigator.serviceWorker.getRegistrations().then(function(regs) {
       debug('Got regs: ' + JSON.stringify(regs));
       regs.forEach(reg => {
