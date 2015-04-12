@@ -1,14 +1,21 @@
 
 (function(sw) {
 
+  console.log('CJC - SWSHIM - Loaded!: ' + JSON.stringify(sw));
+
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isFromIAC(aMessage) {
     return true;
   }
 
+  function extractDataFromMessage(data) {
+    return data;
+  }
+
   var previousOnMessage = sw.onmessage;
   sw.onmessage = function(messageData) {
+    console.log('CJC - SWSHIM - got a message: ' + JSON.stringify(messageData));
     if (isFromIAC(messageData)) {
       // El mensaje viene de IAC o sea que será crossorigin:
       var data = extractDataFromMessage(messageData);
