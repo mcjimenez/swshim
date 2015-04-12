@@ -5,7 +5,7 @@ function debug(str) {
 }
 
 debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
-debug('Loaded navigator_connect_shim_svr.js');
+debug('*** Loaded navigator_connect_shim_svr.js');
 
 (function(exports) {
 
