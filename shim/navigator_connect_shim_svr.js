@@ -76,7 +76,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
         debug('sending message ' + (reg.active?' reg active':'reg NO active'));
         debug('port2:' + (messageChannel.port2 ? ' exists': ' not exists'));
-        reg.active && reg.active.postMessage(message, [messageChannel.port2]);
+        reg.active && reg.active.postMessage(message,'*', [messageChannel.port2]);
       });
     });
   };
