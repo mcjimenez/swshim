@@ -22,8 +22,15 @@ this.addEventListener('fetch', function(evt) {
   debug('fetch event');
 });
 
-this.oncrossoriginconnect = function(msg) {
-  debug("oncrossoriginconnect event");
+this.onconnect = function(msg) {
+  debug("onconnect event");
+  debug("onconnect: We should have a port here on msg.source: " + msg.source);
+  // msg.source should have the endpoint to send and receive messages, so we can do:
+  msg.acceptConnection(true);
+  msg.source.onmessage = function(msg) {
+    debug("Got a message from one of the accepted connections!");
+  }
+
 /*
   if (msg.client.origin != 'https://foo.com') {
     msg.acceptConnection(false);
