@@ -57,4 +57,4 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     unRegBto.addEventListener('click', unregister);
     sendMessageBto.addEventListener('click', window.sendConnectionMessage);
   });
-})(this);
+})(self);
