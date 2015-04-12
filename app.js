@@ -13,6 +13,7 @@
 
   var regBto = document.querySelector('#regBto');
   regBto.addEventListener('click', function(evt) {
+    debug('executing register...');
     navigator.serviceWorker.register('sw.js', {scope: '/swshim/'}
       ).then(function(reg) {
         debug('Registration succeeded. Scope: ' + reg.scope);
