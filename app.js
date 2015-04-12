@@ -6,7 +6,7 @@
     console.log("CJC APP -*-:" + str);
   }
 
-  debug('nos vamos a dar un castañazo');
+  console.log('nos vamos a dar un castañazo');
 
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
