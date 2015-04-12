@@ -37,13 +37,13 @@ debug('myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES NOT EXIST'));
     var returnedMessage = evt.data.dataToSend;
 //    if (event.data.isConnectionRequest) {
     returnedMessage.targetURL="We have to copy the origin URL here";
-    returnedMessage.source = evt.ports[0]; // Store this so the client service worker can store it to answer...
+    returnedMessage.source = evt.data.ports[0]; // Store this so the client service worker can store it to answer...
 
     // And here we should have a way to tell the parent that hey, we've accepted the connection:
     returnedMessage.acceptConnection = function(aPromise) {
       aPromise.then(accepted => {
         // For example...
-        evt.ports[0].postMessage({
+        evt.data.ports[0].postMessage({
           accepted: accepted
         });
       });

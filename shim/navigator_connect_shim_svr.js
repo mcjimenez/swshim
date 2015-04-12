@@ -67,8 +67,10 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // We must construct a structure here to indicate our sw partner that
         var message = {
           isFromIAC: true,
-          data: "Hello from the main thread!",
-          count: count++
+          dataToSend: {
+            data: "Hello from the main thread!",
+            count: count++
+          }
         };
         // This sends the message data as well as transferring messageChannel.port2 to the service worker.
         // The service worker can then use the transferred port to reply via postMessage(), which
@@ -76,7 +78,11 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
         debug('sending message ' + (reg.active?' reg active':'reg NO active'));
         debug('Port2:' + (messageChannel.port2 ? ' exists': ' not exists'));
-        reg.active && reg.active.postMessage(message, [messageChannel.port2]);
+        // According to the sample it should be:
+        //        reg.active && reg.active.postMessage(message, [messageChannel.port2]);
+        // But that doesn't work on Gecko (https://bugzilla.mozilla.org/show_bug.cgi?id=677638#c62)...
+        // let's try:
+        reg.active && reg.active.postMessage({data: message, ports: [messageChannel.port2]});
       });
     });
   };
