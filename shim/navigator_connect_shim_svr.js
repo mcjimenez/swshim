@@ -28,6 +28,9 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     debug("sendMessageByIAC not implemented yet!");
   }
 
+
+  var handlerSet = false;
+
   // This should be in navigator_connect_shim_svr.js
   // When iac connection message is received this has to be executed
   var sendConnectionMessage = function () {
@@ -36,9 +39,12 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       debug('Got regs: ' + JSON.stringify(regs));
       regs.forEach(reg => {
         debug('Got reg: ' + JSON.stringify(reg.active));
+        /* How it should be:
+
         // We need to create a dedicated MessageChannel to get the answer back
         var messageChannel = new MessageChannel();
         debug('messageChannel created');
+
         messageChannel.port1.onmessage = function(event) {
           // We will get the answer here. To do the complete flow, this can be encapsulated on a Promise or whatever we need
           // At this point, just log the response
@@ -61,12 +67,17 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
             }
           }
         };
+        */
 
+
+        /* How it is :( */
         debug('*** creating msg');
 
         // We must construct a structure here to indicate our sw partner that
         var message = {
           isFromIAC: true,
+          isConnectionRequest: true,
+          uuid: generateNewUUID(),
           dataToSend: {
             data: "Hello from the main thread!",
             count: count++
@@ -82,7 +93,17 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         //        reg.active && reg.active.postMessage(message, [messageChannel.port2]);
         // But that doesn't work on Gecko (https://bugzilla.mozilla.org/show_bug.cgi?id=677638#c62)...
         // let's try:
-        reg.active && reg.active.postMessage({data: message, ports: [messageChannel.port2]});
+        //reg.active && reg.active.postMessage({data: message, ports: [messageChannel.port2]});
+        // That doesn't work either. So we'll have to mediate on ALL the frigging messages...
+
+        if (reg.active) {
+          handlerSet = handlerSet ||
+            reg.active.addEventlistener("message", evt => {
+              // Add event handling here! The messages will have an uuid indicating what channel they belong to!
+              console.log("We got an answer! " + JSON.stringify(evt.data));
+            }) || true;
+          reg.active.postMessage(message);
+        }
       });
     });
   };

@@ -6,7 +6,6 @@ function debug(str) {
 
 
 debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
-debug('myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES NOT EXIST'));
 
 (function(sw) {
 
@@ -35,20 +34,28 @@ debug('myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES NOT EXIST'));
     // if MessageChannel works...
     debug('executing extractDataFromMessage...');
     var returnedMessage = evt.data.dataToSend;
-//    if (event.data.isConnectionRequest) {
-    returnedMessage.targetURL="We have to copy the origin URL here";
-    returnedMessage.source = evt.data.ports[0]; // Store this so the client service worker can store it to answer...
+    if (event.data.isConnectionRequest) {
+      returnedMessage.targetURL="We have to copy the origin URL here";
+      returnedMessage.source = {
+        postMessage: msg => {
+          sw.postMessage({uuid: evt.data.uuid, data: msg});
+        }
+      }
+      //evt.data.ports[0]; // Store this so the client service worker can store it to answer...
 
-    // And here we should have a way to tell the parent that hey, we've accepted the connection:
-    returnedMessage.acceptConnection = function(aPromise) {
-      aPromise.then(accepted => {
-        // For example...
-        evt.data.ports[0].postMessage({
-          accepted: accepted
+      // And here we should have a way to tell the parent that hey, we've accepted the connection:
+      returnedMessage.acceptConnection = function(aPromise) {
+        aPromise.then(accepted => {
+          // For example...
+          /*
+            evt.data.ports[0].postMessage({
+            accepted: accepted
+            });
+          */
+          self.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} });
         });
-      });
-    };
-//    } else { // Is this needed? working this way we will only see connection requests because messages will be delivered directly to the SW!
+      };
+    } else { // Is this needed? working this way we will only see connection requests because messages will be delivered directly to the SW!
       // So this complete if might be unneeded since everything will be a connectionrequest...
 //    }
     return returnedMessage;
@@ -70,4 +77,4 @@ debug('myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES NOT EXIST'));
       previousOnMessage(messageData);
     }*/
   });
-})(self || myServiceWorker);
+})(self);

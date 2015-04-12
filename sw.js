@@ -1,11 +1,8 @@
 'use strict';
 
 function debug(str) {
-  self.console.log("CJC sw.js -*- -->" + str);
+  this.self.console.log("CJC sw.js -*- -->" + str);
 }
-
-// This is only really needed if self is not defined
-var myServiceWorker = this;
 
 this.addEventListener('install', function(evt) {
   debug('Install event');
