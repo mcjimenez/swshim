@@ -10,6 +10,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 (function(exports) {
 
   var count = 0;
+  var connections = {};
 
   function generateNewUUID() {
     var d = new Date().getTime();
@@ -21,6 +22,10 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     });
     debug('generateNewUUID(): ' + uuid);
     return uuid;
+  }
+
+  function sendMessageByIAC() {
+    debug("sendMessageByIAC not implemented yet!");
   }
 
   // This should be in navigator_connect_shim_svr.js
@@ -57,6 +62,8 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
           }
         };
 
+        debug('*** creating msg');
+
         // We must construct a structure here to indicate our sw partner that
         var message = {
           isFromIAC: true,
@@ -67,6 +74,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // The service worker can then use the transferred port to reply via postMessage(), which
         // will in turn trigger the onmessage handler on messageChannel.port1.
         // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        debug('sending message');
         reg.active && reg.active.postMessage(message, [messageChannel.port2]);
       });
     });
