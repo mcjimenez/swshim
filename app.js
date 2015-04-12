@@ -8,11 +8,12 @@
 
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
+    return;
   }
 
   var regBto = document.querySelector('#regBto');
   regBto.addEventListener('click', function(evt) {
-    navigator.serviceWorker.register('sw.js', {scope: './'}
+    navigator.serviceWorker.register('sw.js', {scope: '/swshim/'}
       ).then(function(reg) {
         debug('Registration succeeded. Scope: ' + reg.scope);
         if (reg.installing) {
