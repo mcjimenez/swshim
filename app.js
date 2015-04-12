@@ -40,11 +40,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     });
   };
 
-  function sendMessageByIAC() {
-    debug("sendMessageByIAC not implemented yet!");
-  }
-
-
   window.addEventListener('load', function () {
     debug('Document loaded!');
     var regBto = document.querySelector('#regBto');
