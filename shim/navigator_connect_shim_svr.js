@@ -4,7 +4,7 @@ function debug(str) {
   console.log("CJC navConnShim_SVR.js -*- -->" + str);
 }
 
-debug('Loaded navigator_connect_shim_svr.js');
+debug('!! Loaded navigator_connect_shim_svr.js');
 debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function(exports) {
