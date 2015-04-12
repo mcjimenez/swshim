@@ -4,10 +4,13 @@ function debug(str) {
   console.log("CJC sw.js -*- -->" + str);
 }
 
-var mySW = this;
+// This is only really needed if self is not defined
+var myServiceWorker = this;
 
 this.addEventListener('install', function(evt) {
   debug('Install event');
+  this.importScripts("shim/navigator_connect_shim_sw.js");
+
 });
 
 this.addEventListener('activate', function(evt) {

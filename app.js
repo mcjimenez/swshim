@@ -2,6 +2,8 @@
 
 (function() {
 
+  var count = 0;
+
   function debug(str) {
     console.log("CJC APP -*-:" + str);
   }
@@ -40,11 +42,23 @@
     });
   };
 
+  // This should be in navigator_connect_shim_svr.js
+  // When iac message is received this has to be executed
+  var sendMessage = function () {
+    navigator.serviceWorker.postMessage({
+      isFromIAC: true,
+      data: "Hello from the main thread!",
+      count: count++
+    });
+  };
+
   window.addEventListener('load', function () {
     debug("Document loaded!");
     var regBto = document.querySelector('#regBto');
     var unRegBto = document.querySelector('#unregBto');
+    var sendMessageBto = document.querySelector('#sendMsgBto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
+    sendMessageBto.addEventListener('click', sendMessage);
   });
 })();
