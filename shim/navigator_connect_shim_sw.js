@@ -13,6 +13,9 @@ console.log('CJC - SWSHIM myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES N
   }
 
   function extractDataFromMessage(data) {
+    for (var kk in data) {
+      console.log("CJC extractDataFromMessage --> "+kk);
+    }
     if (data.detail) {
       console.log("CJC - SWSHIM - data.detail: " + JSON.stringify(data.detail));
     }
