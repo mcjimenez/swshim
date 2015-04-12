@@ -1,7 +1,10 @@
 
+console.log('CJC - SWSHIM Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
+console.log('CJC - SWSHIM myServiceWorker: ' + (myServiceWorker?'EXISTS':'DOES NOT EXIST'));
+
 (function(sw) {
 
-  console.log('CJC - SWSHIM - Loaded!: ' + JSON.stringify(sw));
+  console.log('CJC - SWSHIM - Loaded! ');
 
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
