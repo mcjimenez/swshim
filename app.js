@@ -8,9 +8,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function() {
 
-  var count = 0;
-  var mySelf = this;
-
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
     return;

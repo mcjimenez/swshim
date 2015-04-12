@@ -9,6 +9,8 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function(exports) {
 
+  var count = 0;
+
   function generateNewUUID() {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
