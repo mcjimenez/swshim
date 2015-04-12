@@ -44,19 +44,17 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       //evt.data.ports[0]; // Store this so the client service worker can store it to answer...
 
       // And here we should have a way to tell the parent that hey, we've accepted the connection:
-      returnedMessage.acceptConnection = function(aPromise) {
-        aPromise.then(accepted => {
-          // For example...
-          /*
-            evt.data.ports[0].postMessage({
-            accepted: accepted
-            });
-          */
-          self.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} });
+      returnedMessage.acceptConnection = aPromise =>
+        aPromise.then(accepted => self.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
+      // For example...
+      /*
+        evt.data.ports[0].postMessage({
+        accepted: accepted
         });
-      };
+      */
     } else { // Is this needed? working this way we will only see connection requests because messages will be delivered directly to the SW!
       // So this complete if might be unneeded since everything will be a connectionrequest...
+      debug("Implement me!");
     }
     return returnedMessage;
   }
