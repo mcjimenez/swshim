@@ -7,6 +7,8 @@
   }
 
   console.log('nos vamos a dar un castañazo');
+  var a = 1, b = 0;
+  return a/b;
 
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
