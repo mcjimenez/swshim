@@ -49,7 +49,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
           // We got a value instead of a promise...
           aPromise = Promise.resolve(aPromise);
         }
-        aPromise.then(accepted => self.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
+        aPromise.then(accepted => sw.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
       };
       // For example...
       /*
