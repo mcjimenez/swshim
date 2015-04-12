@@ -74,7 +74,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         // The service worker can then use the transferred port to reply via postMessage(), which
         // will in turn trigger the onmessage handler on messageChannel.port1.
         // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
-        debug('sending message');
+        debug('sending message ' + (reg.active?' reg no active':'reg active'));
         reg.active && reg.active.postMessage(message, [messageChannel.port2]);
       });
     });
