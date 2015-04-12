@@ -31,6 +31,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         debug('Got reg: ' + JSON.stringify(reg.active));
         // We need to create a dedicated MessageChannel to get the answer back
         var messageChannel = new MessageChannel();
+        debug('messageChannel created');
         messageChannel.port1.onmessage = function(event) {
           // We will get the answer here. To do the complete flow, this can be encapsulated on a Promise or whatever we need
           // At this point, just log the response
