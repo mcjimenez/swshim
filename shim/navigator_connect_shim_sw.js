@@ -44,8 +44,13 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       //evt.data.ports[0]; // Store this so the client service worker can store it to answer...
 
       // And here we should have a way to tell the parent that hey, we've accepted the connection:
-      returnedMessage.acceptConnection = aPromise =>
+      returnedMessage.acceptConnection = aPromise => {
+        if (typeof aPromise.then != "function") {
+          // We got a value instead of a promise...
+          aPromise = Promise.resolve(aPromise);
+        }
         aPromise.then(accepted => self.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
+      };
       // For example...
       /*
         evt.data.ports[0].postMessage({
