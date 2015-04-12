@@ -1,15 +1,15 @@
 'use strict';
 
+function debug(str) {
+  console.log("CJC APP -*-:" + str);
+}
+
+debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
+
 (function() {
 
   var count = 0;
   var mySelf = this;
-
-  function debug(str) {
-    console.log("CJC APP -*-:" + str);
-  }
-
-  console.log('nos vamos a dar un castañazo');
 
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
@@ -56,6 +56,6 @@
     var sendMessageBto = document.querySelector('#sendMsgBto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
-    sendMessageBto.addEventListener('click', sendConnectionMessage);
+    sendMessageBto.addEventListener('click', window.sendConnectionMessage);
   });
-})();
+})(this);

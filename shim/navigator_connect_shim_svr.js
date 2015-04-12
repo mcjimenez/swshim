@@ -67,5 +67,5 @@ debug('Loaded navigator_connect_shim_svr.js');
     });
   };
 
-  exports.sendConnectionMessage = sendConnectionMessage;
+  window.sendConnectionMessage = sendConnectionMessage;
 })(this);
