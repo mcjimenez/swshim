@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  this.self.console.log("CJC sw.js -*- -->" + str);
+  console.log("CJC sw.js -*- -->" + str);
 }
 
 this.addEventListener('install', function(evt) {

@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  self.console.log("CJC navConnShim_sw.js -*- -->" + str);
+  console.log("CJC navConnShim_sw.js -*- -->" + str);
 }
 
 
@@ -18,7 +18,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   function extractDataFromMessage(evt) {
-
     // evt.ports[0] corresponds to the MessagePort that was transferred as part of the controlled page's
     // call to controller.postMessage(). Therefore, evt.ports[0].postMessage() will trigger the onmessage
     // handler from the controlled page.
