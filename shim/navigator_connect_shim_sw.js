@@ -57,7 +57,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       };
     } else { // Is this needed? working this way we will only see connection requests because messages will be delivered directly to the SW!
       // So this complete if might be unneeded since everything will be a connectionrequest...
-//    }
+    }
     return returnedMessage;
   }
 
