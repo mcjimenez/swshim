@@ -9,7 +9,8 @@ var myServiceWorker = this;
 
 this.addEventListener('install', function(evt) {
   debug('Install event');
-  this.importScripts("/swshim/shim/navigator_connect_shim_sw.js") || debug("importScripts failed!");
+  this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
+  debug("importScripts executed (hopefully)!");
 
 });
 
@@ -20,6 +21,14 @@ this.addEventListener('activate', function(evt) {
 this.addEventListener('fetch', function(evt) {
   debug('fetch event');
 });
+
+this.addEventListener('message', function(evt) {
+  debug("got a message!");
+});
+
+this.onmessage = function(message) {
+  debug("Got a message, second method!");
+};
 
 this.oncrossoriginconnect = function(msg) {
   debug("oncrossoriginconnect event");
