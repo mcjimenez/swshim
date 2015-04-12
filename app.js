@@ -46,7 +46,9 @@
   // When iac message is received this has to be executed
   var sendMessage = function () {
     navigator.serviceWorker.getRegistrations().then(function(regs) {
+      debug('Got regs: ' + JSON.stringify(regs));
       regs.forEach(reg => {
+        debug('Got reg: ' + JSON.stringify(reg.active));
         reg.active && reg.active.postMessage({
           isFromIAC: true,
           data: "Hello from the main thread!",
