@@ -43,16 +43,24 @@
   };
 
   function sendMessageByIAC() {
-    console.log("CJC - sendMessageByIAC not implemented yet!");
+    debug("sendMessageByIAC not implemented yet!");
   }
+
   function generateNewUUID() {
-    console.log("CJC - generateNewUUID() not implemented here");
-    return "aaaaa-bbbb-cccc-dddd";
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    debug('generateNewUUID(): ' + uuid);
+    return uuid;
   }
 
   // This should be in navigator_connect_shim_svr.js
   // When iac connection message is received this has to be executed
   var sendConnectionMessage = function () {
+    debug('sendConnectionMessage!!');
     navigator.serviceWorker.getRegistrations().then(function(regs) {
       debug('Got regs: ' + JSON.stringify(regs));
       regs.forEach(reg => {
@@ -77,12 +85,12 @@
               messageChannel.port1.onmessage = function(messageEvent) {
                 // Here we have to pass this message to the other side of the IAC connection...
                 sendMessageByIAC(newConnectionId, messageEvent);
-              }
+              };
             }
           }
         };
 
-        // We must construct a structure here to indicate our sw partner that 
+        // We must construct a structure here to indicate our sw partner that
         var message = {
           isFromIAC: true,
           data: "Hello from the main thread!",
@@ -98,7 +106,7 @@
   };
 
   window.addEventListener('load', function () {
-    debug("Document loaded!");
+    debug('Document loaded!');
     var regBto = document.querySelector('#regBto');
     var unRegBto = document.querySelector('#unregBto');
     var sendMessageBto = document.querySelector('#sendMsgBto');
