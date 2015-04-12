@@ -16,8 +16,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     return;
   }
 
-  mySelf.importScripts("/swshim/shim/navigator_connect_shim_svr.js");
-
   var register = function(evt) {
     debug('executing register...');
     navigator.serviceWorker.register('sw.js', {scope: '/swshim/'}
