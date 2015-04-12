@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC navConnShim_sw.js -*- -->" + str);
+  self.console.log("CJC navConnShim_sw.js -*- -->" + str);
 }
 
 

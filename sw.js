@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC sw.js -*- -->" + str);
+  self.console.log("CJC sw.js -*- -->" + str);
 }
 
 // This is only really needed if self is not defined
