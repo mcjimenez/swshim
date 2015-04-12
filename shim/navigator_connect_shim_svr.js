@@ -98,7 +98,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
         if (reg.active) {
           handlerSet = handlerSet ||
-            reg.active.addEventlistener("message", evt => {
+            reg.active.addEventListener("message", evt => {
               // Add event handling here! The messages will have an uuid indicating what channel they belong to!
               console.log("We got an answer! " + JSON.stringify(evt.data));
             }) || true;
