@@ -4,17 +4,18 @@ function debug(str) {
   console.log("CJC navConnShim_SVR.js -*- -->" + str);
 }
 
+debug('Loaded navigator_connect_shim_svr.js');
 debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
-debug('*** Loaded navigator_connect_shim_svr.js');
 
 (function(exports) {
 
   function generateNewUUID() {
     var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+      function(c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
     debug('generateNewUUID(): ' + uuid);
     return uuid;
@@ -68,5 +69,6 @@ debug('*** Loaded navigator_connect_shim_svr.js');
     });
   };
 
-  window.sendConnectionMessage = sendConnectionMessage;
-})(this);
+  exports.sendConnectionMessage = sendConnectionMessage;
+
+})(self);

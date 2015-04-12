@@ -55,6 +55,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     var sendMessageBto = document.querySelector('#sendMsgBto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
-    sendMessageBto.addEventListener('click', window.sendConnectionMessage);
+    sendMessageBto.addEventListener('click', self.sendConnectionMessage);
   });
 })(self);
