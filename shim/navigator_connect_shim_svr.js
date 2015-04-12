@@ -66,9 +66,12 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
         // We must construct a structure here to indicate our sw partner that
         var message = {
+/*
           isFromIAC: true,
           data: "Hello from the main thread!",
           count: count++
+*/
+          'isFromIAC': true
         };
         // This sends the message data as well as transferring messageChannel.port2 to the service worker.
         // The service worker can then use the transferred port to reply via postMessage(), which
