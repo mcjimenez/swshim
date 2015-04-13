@@ -26,12 +26,13 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       } else if (reg.waiting) {
         debug('registration --> waiting');
       } else if (reg.active) {
+        debug('registration --> active');
+        debug('setting client\'s msg handler');
         // When sw is really installed we'll be ready to proccess message
         navigator.serviceWorker.addEventListener('message', evt => {
           debug('recibe un msg!!');
           debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
         });
-        debug('registration --> active');
       }
       // Reload document... (yep sucks!)
       location.reload();
