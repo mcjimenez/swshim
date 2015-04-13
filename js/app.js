@@ -63,6 +63,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       };
       debug('sending message ' + (sw.active ? ' sw active':' sw NO active'));
       navigator.serviceWorker.addEventListener('message', evt => {
+        debug('recibe un msg!!');
         debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
       });
       sw.active && sw.active.postMessage(message);
