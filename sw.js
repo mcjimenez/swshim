@@ -41,6 +41,7 @@ onmessage = evt => {
     var respMsg = evt.data.dataToSend;
     respMsg.org = ORIG;
     respMsg.swCount = swCount++;
+    debug('SW enviar --> dataToSend:' + JSON.stringify(respMsg));
     res[0].postMessage(respMsg);
   });
 };
