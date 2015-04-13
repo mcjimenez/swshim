@@ -26,6 +26,11 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       } else if (reg.waiting) {
         debug('registration --> waiting');
       } else if (reg.active) {
+        // When sw is really installed we'll be ready to proccess message
+        navigator.serviceWorker.addEventListener('message', evt => {
+          debug('recibe un msg!!');
+          debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
+        });
         debug('registration --> active');
       }
       // Reload document... (yep sucks!)
@@ -62,10 +67,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         }
       };
       debug('sending message ' + (sw.active ? ' sw active':' sw NO active'));
-      navigator.serviceWorker.addEventListener('message', evt => {
-        debug('recibe un msg!!');
-        debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
-      });
       sw.active && sw.active.postMessage(message);
     });
   };
