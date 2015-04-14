@@ -84,6 +84,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
   function sendMessage(msg) {
     debug('Dentro sendMessage');
+
     self.clients.matchAll().then(res => {
       if (!res.length) {
         debug('Error: no clients are currently controlled.');

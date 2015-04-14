@@ -32,6 +32,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 
   function registerHandlers() {
+    debug('registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
       console.log('APP? recibe un msg!!');
       console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
