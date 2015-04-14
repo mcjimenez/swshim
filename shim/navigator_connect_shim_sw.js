@@ -96,7 +96,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   sw.addEventListener('message', function(evt) {
-    debug('SW got a message: ' + JSON.stringify(evt.data));
+    debug('****SW***** got a message: ' + JSON.stringify(evt.data));
     if (isFromIAC(evt)) {
       // types of msg: connect, data
       //if (sw.onconnect && typeof sw.onconnect == "function") {

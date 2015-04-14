@@ -34,7 +34,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   function registerHandlers() {
     debug('registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
-      console.log('APP? recibe un msg!!');
+      console.log('*** APP***  recibe un msg!!');
       console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
       // Here we have to pass this message to the other side of the IAC connection...
       sendMessageByIAC();
