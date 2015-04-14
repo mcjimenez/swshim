@@ -8,9 +8,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function() {
 
-  var cltCount = 0;
-  var ORIG = 'clt';
-
   if (!('serviceWorker' in navigator)) {
     debug('navigator has not ServiceWorker');
     return;
@@ -29,16 +26,23 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         debug('registration --> active');
         debug('setting client\'s msg handler');
         // When sw is really installed we'll be ready to proccess message
-        navigator.serviceWorker.addEventListener('message', evt => {
-          debug('recibe un msg!!');
-          debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
-        });
+        self.regiterHandlers();
       }
       // Reload document... (yep sucks!)
       location.reload();
     }).catch(function(error) {
       debug('Registration failed with ' + error);
     });
+  };
+
+  // If you want receive datas from sw implement this function
+  var msgFromSW = function(evt) {
+    debug('data from sw:' + JSON.stringify(evt));
+  };
+
+  // If you want send Data to a sw implement this function
+  var msgToSW = function(evt) {
+    debug('Data to SW:' + JSON.stringify(evt));
   };
 
   var unregister = function(evt) {
@@ -48,27 +52,6 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         reg.unregister();
         debug('Unregister done');
       });
-    });
-  };
-
-  var sendConnectionMessage = function () {
-    debug('sendConnectionMessage...');
-    navigator.serviceWorker.ready.then(sw => {
-      debug('Got sw: ' + JSON.stringify(sw));
-      debug('*** creating msg');
-      // We must construct a structure here to indicate our sw partner that
-      var message = {
-        isFromIAC: true,
-        isConnectionRequest: true,
-        uuid: '12345678-9abc-4def-y012-34567890abcd',
-        dataToSend: {
-          data: "Hello from the main thread!",
-          org: ORIG,
-          cltCount: cltCount++
-        }
-      };
-      debug('sending message ' + (sw.active ? ' sw active':' sw NO active'));
-      sw.active && sw.active.postMessage(message);
     });
   };
 
@@ -86,7 +69,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     var sendMessageBto = document.querySelector('#sendMsgBto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
-    sendMessageBto.addEventListener('click', sendConnectionMessage);
+    sendMessageBto.addEventListener('click', self.sendMessage);
   });
 
 })(self);

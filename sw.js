@@ -1,14 +1,12 @@
 'use strict';
 
-var swCount = 0;
-var ORIG = 'SW';
-
 function debug(str) {
   console.log("CJC sw.js -*- -->" + str);
 }
 
 this.addEventListener('install', function(evt) {
   debug('Install event');
+  this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
   debug("importScripts executed (hopefully)!");
 });
 
@@ -30,18 +28,8 @@ this.onconnect = function(msg) {
   };
 };
 
-onmessage = evt => {
-  debug('SW got a message: data:' + JSON.stringify(evt.data));
-  self.clients.matchAll().then(res => {
-    if (!res.length) {
-      debug("ERROR: no clients are currently controlled.\n");
-      return;
-    }
-    debug('enviar');
-    var respMsg = evt.data.dataToSend;
-    respMsg.org = ORIG;
-    respMsg.swCount = swCount++;
-    debug('SW enviar --> dataToSend:' + JSON.stringify(respMsg));
-    res[0].postMessage(respMsg);
-  });
-};
+// Please do not implemente onmessage, instead of it implements this
+var msgFromSWToApp = function(data) {
+  debug('SW datas that we want to send');
+}
+
