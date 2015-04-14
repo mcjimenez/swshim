@@ -26,7 +26,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         debug('registration --> active');
         debug('setting client\'s msg handler');
         // When sw is really installed we'll be ready to proccess message
-        self.regiterHandlers();
+        self.registerHandlers();
       }
       // Reload document... (yep sucks!)
       location.reload();
