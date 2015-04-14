@@ -31,5 +31,5 @@ this.onconnect = function(msg) {
 // Please do not implemente onmessage, instead of it implements this
 var msgFromSWToApp = function(data) {
   debug('SW datas that we want to send');
-}
+};
 

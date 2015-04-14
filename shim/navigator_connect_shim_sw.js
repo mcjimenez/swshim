@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC navConnShim_sw.js -*- -->" + str);
+  console.log("CJC SHIM SW.js -*- -->" + str);
 }
 
 
@@ -17,6 +17,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isFromIAC(aMessage) {
+    debug('IsFromIAC'):
     return true;
   }
 
@@ -82,6 +83,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   function sendMessage(msg) {
+    debug('Dentro sendMessage');
     self.clients.matchAll().then(res => {
       if (!res.length) {
         debug('Error: no clients are currently controlled.');
@@ -93,7 +95,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   sw.addEventListener('message', function(evt) {
-    debug('got a message: ' + JSON.stringify(evt.data));
+    debug('SW got a message: ' + JSON.stringify(evt.data));
     if (isFromIAC(evt)) {
       // types of msg: connect, data
       //if (sw.onconnect && typeof sw.onconnect == "function") {
@@ -101,7 +103,9 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       //}
       // El mensaje viene de IAC o sea que será crossorigin:
       var data = extractDataFromMessage(evt);
-      sendMessage(generateResponse(data));
+      var msg = generateResponse(data);
+      debug('sending msg:' + JSON.stringify(msg));
+      sendMessage(msg);
     }/*
       If there was a previously event putted this addEventListener
       simply will be ignored

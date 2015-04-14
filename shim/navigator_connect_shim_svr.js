@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC navConnShim_SVR.js -*- -->" + str);
+  console.log("CJC SHIM SVR.js -*- -->" + str);
 }
 
 debug('!! Loaded navigator_connect_shim_svr.js');
@@ -33,8 +33,8 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
   function registerHandlers() {
     navigator.serviceWorker.addEventListener('message', evt => {
-      debug('recibe un msg!!');
-      debug('Msg recibido en app --> ' + JSON.stringify(evt.data));
+      console.log('APP? recibe un msg!!');
+      console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
       // Here we have to pass this message to the other side of the IAC connection...
       sendMessageByIAC();
     });
@@ -44,7 +44,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
   // Msg from app to sw
   var sendMessage = function () {
-    debug('sendConnectionMessage...');
+    debug('sendMessage...');
     navigator.serviceWorker.ready.then(sw => {
       debug('Got regs: ' + JSON.stringify(sw));
       debug('*** creating msg');
