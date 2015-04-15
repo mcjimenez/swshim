@@ -65,7 +65,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     var sendMessageBto = document.querySelector('#sendMsgBto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
-    sendMessageBto.addEventListener('click', NCShim.sendMessage);
+    sendMessageBto.addEventListener('click', NCShim.sendMessage.bind(null, undefined));
   });
 
 })(self);
