@@ -86,7 +86,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
           // We got a value instead of a promise...
           aPromise = Promise.resolve(aPromise);
         }
-        aPromise.then(accepted => sw.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
+        aPromise.then(accepted => sendMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
       };
 
       // On this object the onconnect handler add an event listener/set a handler
