@@ -26,7 +26,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     return uuid;
   }
 
-  function sendMessageByIAC() {
+  function sendMessageByIAC(evt) {
     debug("sendMessageByIAC not implemented yet!");
   }
 
@@ -34,31 +34,42 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   function registerHandlers() {
     debug('registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
+      if (!isInternalMessage(evt)) {
+        return;
+      }
       console.log('*** APP***  recibe un msg!!');
       console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
       // Here we have to pass this message to the other side of the IAC connection...
-      sendMessageByIAC();
+      sendMessageByIAC(evt);
     });
   }
 
   var handlerSet = false;
 
+  // Returns true if the message (from IAC) is a connection request,
+  // false otherwise.
+  var isConnectionRequest = function(message) {
+    return true;
+  };
+
   // Msg from app to sw
-  var sendMessage = function () {
+  var sendMessage = function(aMessage) {
     debug('sendMessage...');
     navigator.serviceWorker.ready.then(sw => {
       debug('Got regs: ' + JSON.stringify(sw));
       debug('*** creating msg');
       // We must construct a structure here to indicate our sw partner that
-      var message = {
-        isFromIAC: true,
-        isConnectionRequest: true,
-        uuid: generateNewUUID(),
-        dataToSend: {
+      aMessage = aMessage || {
           data: "Hello from the main thread!",
           count: cltCount++,
           org: ORIGN
-        }
+      };
+
+      var message = {
+        isFromIAC: true,
+        isConnectionRequest: isConnectionRequest(aMessage),
+        uuid: generateNewUUID(),
+        dataToSend: aMessage
       };
       // This sends the message data as well as transferring messageChannel.port2 to the service worker.
       // The service worker can then use the transferred port to reply via postMessage(), which
@@ -69,7 +80,20 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     });
   };
 
-  exports.sendMessage = sendMessage;
-  exports.registerHandlers = registerHandlers;
+  function isInternalMessage(evt) {
+    return true;
+  };
 
-})(self);
+
+  navigator.serviceWorker.ready.then(registerHandlers);
+
+  // This whole object should not be needed, except for tests, if MessageChannel did work.
+  // Since it doesn't work for Service Workers, it's needed, sadly.
+  exports.NCShim = {
+    // sendMessage exported only for tests!
+    sendMessage: sendMessage,
+    // And this is needed only because MessageChannel doesn't currently work!
+    isInternalMessage: isInternalMessage
+  };
+
+})(window);

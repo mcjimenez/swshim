@@ -25,24 +25,12 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       } else if (reg.active) {
         debug('registration --> active');
         debug('setting client\'s msg handler');
-        // When sw is really installed we'll be ready to proccess message
-        self.registerHandlers();
       }
       // Reload document... (yep sucks!)
       location.reload();
     }).catch(function(error) {
       debug('Registration failed with ' + error);
     });
-  };
-
-  // If you want receive datas from sw implement this function
-  var msgFromSW = function(evt) {
-    debug('data from sw:' + JSON.stringify(evt));
-  };
-
-  // If you want send Data to a sw implement this function
-  var msgToSW = function(evt) {
-    debug('Data to SW:' + JSON.stringify(evt));
   };
 
   var unregister = function(evt) {
@@ -56,6 +44,14 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   };
 
   window.addEventListener('message', function(evt) {
+    // This is shim specific (and wouldn't be needed if navigator.connect were native, or
+    // MessageChannel worked!). If we want to process messages that come from our service
+    // worker, we need to ignore the shim internal messages. So, dirty and quick:
+    if (NCShim.isInternalMessage(evt)) {
+      return;
+    }
+
+    // from this point on, you would write your handler as if the shim weren't present.
     debug('Msg recibido en app');
     for (var kk in evt) {
       debug("onMesssage -->:"+kk+":"+JSON.stringify(evt[kk]));

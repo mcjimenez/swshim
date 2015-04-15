@@ -4,10 +4,11 @@ function debug(str) {
   console.log("CJC sw.js -*- -->" + str);
 }
 
+this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
+debug("importScripts executed (hopefully)!");
+
 this.addEventListener('install', function(evt) {
   debug('Install event');
-  this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
-  debug("importScripts executed (hopefully)!");
 });
 
 this.addEventListener('activate', function(evt) {
@@ -28,8 +29,14 @@ this.onconnect = function(msg) {
   };
 };
 
-// Please do not implemente onmessage, instead of it implements this
-var msgFromSWToApp = function(data) {
-  debug('SW datas that we want to send');
-};
+this.addEventListener('message', function(evt) {
+  // This is a hack caused by the lack of dedicated MessageChannels... sorry!
+  if (this.NCShim.isInternalMessage(evt)) {
+    return;
+  }
+
+  // Your code here
+  debug("We got a message for us!");
+});
+
 

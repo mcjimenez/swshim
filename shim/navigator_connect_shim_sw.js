@@ -16,26 +16,36 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
-  function isFromIAC(aMessage) {
-    debug('IsFromIAC');
+  function isInternalMessage(aMessage) {
+    debug('IsInternalMessage');
     return true;
   }
 
-//  function extractDataFromMessage(evt) {
-    // evt.ports[0] corresponds to the MessagePort that was transferred as part of the controlled page's
-    // call to controller.postMessage(). Therefore, evt.ports[0].postMessage() will trigger the onmessage
+  // This function processes a message from the client side, and passes it to the
+  // service worker to be processed.
+  function transmitMessage(evt) {
+    // In theory,
+    // evt.ports[0] should correspond to the MessagePort that was transferred as part of
+    // the controlled page's call to controller.postMessage(). Therefore,
+    // evt.ports[0].postMessage() will trigger the onmessage
     // handler from the controlled page.
-    //   It's up to you how to structure the messages that you send back; this is just one example.
+    // THIS DOESN'T WORK YET!
+    // So much of the code of this function is a workaround around that...
+
+    // We can get two kind of messages here: connection requests, and messages on a
+    // (previously accepted) connection. As such, we should keep a table of previously
+    // accepted connections to know which 'channel' should get the message. Again, this should
+    // not be needed. Alas, MessageChannel doesn't work. I think I'm going to say that a lot.
+
+      debug('executing transmitMessage...');
 
     // We need to construct here what we will pass to onconnect, based on what we have received
     // onconnect will need a way to return data to the source
     // http://mkruisselbrink.github.io/navigator-connect/
-    // Basically there are two options here. Either this is a connect message, or it's a message to a given port.
     // if it's a connect message, then we have to add an acceptConnection method to the event we dispatch.
     // Otherwise, we have to dispatch the message to the correct underlying port. And maybe that's not even needed
     // if MessageChannel works...
 
-//    debug('executing extractDataFromMessage...');
 //    var returnedMessage = evt.data.dataToSend;
 //    if (evt.data.isConnectionRequest) {
 //      returnedMessage.targetURL="We have to copy the origin URL here";
@@ -68,7 +78,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 //      debug("Implement me!");
 //    }
 //    return returnedMessage;
-//  }
+  }
 
   function extractDataFromMessage(msg) {
     return msg.data.dataToSend;
@@ -97,22 +107,22 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
   sw.addEventListener('message', function(evt) {
     debug('****SW***** got a message: ' + JSON.stringify(evt.data));
-    if (isFromIAC(evt)) {
-      // types of msg: connect, data
-      //if (sw.onconnect && typeof sw.onconnect == "function") {
-      //  sw.onconnect(data);
-      //}
-      // El mensaje viene de IAC o sea que será crossorigin:
-      var data = extractDataFromMessage(evt);
-      var msg = generateResponse(data);
-      debug('sending msg:' + JSON.stringify(msg));
-      sendMessage(msg);
-    }/*
-      If there was a previously event putted this addEventListener
-      simply will be ignored
-      else if (previousOnMessage && typeof previousOnMessage == "function") {
-      // Igual no venia de IAC sino de lo que haga la app normalmente
-      previousOnMessage(messageData);
-    }*/
+    if (!isInternalMessage(evt)) {
+      return;
+    }
+    // types of msg: connect, data
+    //if (sw.onconnect && typeof sw.onconnect == "function") {
+    //  sw.onconnect(data);
+    //}
+    // El mensaje viene de IAC o sea que será crossorigin:
+    var data = evt.dataToSend;  //extractDataFromMessage(evt);
+    var msg = generateResponse(data);
+    debug('sending msg:' + JSON.stringify(msg));
+    sendMessage(msg);
   });
+
+  sw.NCShim = {
+    isInternalMessage: isInternalMessage
+  };
+
 })(self);
