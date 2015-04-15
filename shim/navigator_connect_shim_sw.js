@@ -8,6 +8,10 @@ function debug(str) {
 debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function(sw) {
+  // It's not good trying to load this twice
+  if (sw.NCShim) {
+    return;
+  }
 
   var swCount = 0;
   var ORIGN = 'SW';
