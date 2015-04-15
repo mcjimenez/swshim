@@ -21,76 +21,8 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     return true;
   }
 
-  // This function processes a message from the client side, and passes it to the
-  // service worker to be processed.
-  function transmitMessage(evt) {
-    // In theory,
-    // evt.ports[0] should correspond to the MessagePort that was transferred as part of
-    // the controlled page's call to controller.postMessage(). Therefore,
-    // evt.ports[0].postMessage() will trigger the onmessage
-    // handler from the controlled page.
-    // THIS DOESN'T WORK YET!
-    // So much of the code of this function is a workaround around that...
+  var _messageChannels = {};
 
-    // We can get two kind of messages here: connection requests, and messages on a
-    // (previously accepted) connection. As such, we should keep a table of previously
-    // accepted connections to know which 'channel' should get the message. Again, this should
-    // not be needed. Alas, MessageChannel doesn't work. I think I'm going to say that a lot.
-
-      debug('executing transmitMessage...');
-
-    // We need to construct here what we will pass to onconnect, based on what we have received
-    // onconnect will need a way to return data to the source
-    // http://mkruisselbrink.github.io/navigator-connect/
-    // if it's a connect message, then we have to add an acceptConnection method to the event we dispatch.
-    // Otherwise, we have to dispatch the message to the correct underlying port. And maybe that's not even needed
-    // if MessageChannel works...
-
-//    var returnedMessage = evt.data.dataToSend;
-//    if (evt.data.isConnectionRequest) {
-//      returnedMessage.targetURL="We have to copy the origin URL here";
-      // El handler al que llamemos pondrá un onmessage aqui, que tendremos que guardar con cariño para pasarle los mensajes...
-      // (en el else que no está hecho)
-//      returnedMessage.source = {
-//        postMessage: msg => {
-//          sw.postMessage({uuid: evt.data.uuid, data: msg});
-//        }
-//      };
-      //evt.data.ports[0]; // Store this so the client service worker can store it to answer...
-
-      // And here we should have a way to tell the parent that hey, we've accepted the connection:
-//      returnedMessage.acceptConnection = aPromise => {
-//        if (typeof aPromise.then != "function") {
-          // We got a value instead of a promise...
-//          aPromise = Promise.resolve(aPromise);
-//        }
-//        aPromise.then(accepted => sw.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
-//      };
-      // For example...
-      /*
-        evt.data.ports[0].postMessage({
-        accepted: accepted
-        });
-      */
-//    } else {
-      // Is this needed? working this way we will only see connection requests because messages will be delivered directly to the SW!
-      // So this complete if might be unneeded since everything will be a connectionrequest...
-//      debug("Implement me!");
-//    }
-//    return returnedMessage;
-  }
-
-  function extractDataFromMessage(msg) {
-    return msg.data.dataToSend;
-  }
-
-  function generateResponse(msg) {
-    var respMsg = msg;
-    debug('SW enviar --> dataToSend:' + JSON.stringify(msg));
-    respMsg.org = ORIGN;
-    respMsg.swCount = swCount++;
-    return respMsg;
-  }
 
   function sendMessage(msg) {
     debug('Dentro sendMessage');
@@ -105,20 +37,84 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     });
   }
 
+  // This function converts the message received to the message format that the
+  // onconnect or onmessage handlers expect, and invokes the adequate handler
+  function transmitMessage(evt) {
+    debug('executing convertMessage...');
+
+    // In theory,
+    // evt.ports[0] should correspond to the MessagePort that was transferred as part of
+    // the controlled page's call to controller.postMessage(). Therefore,
+    // evt.ports[0].postMessage() will trigger the onmessage
+    // handler from the controlled page.
+    // THIS DOESN'T WORK YET!
+    // So much of the code of this function is a workaround around that...
+
+    // We can get two kind of messages here: connection requests, and messages on a
+    // (previously accepted) connection. As such, we should keep a table of previously
+    // accepted connections to know which 'channel' should get the message. Again, this should
+    // not be needed. Alas, MessageChannel doesn't work. I think I'm going to say that a lot.
+
+    // Maybe we would need to do something with this...
+    if (evt.data.isConnectionRequest) {
+      var connectionMessage = evt.data.dataToSend;
+      // We need to construct here what we will pass to onconnect, based on what we have received
+      // onconnect will need a way to return data to the source
+      // http://mkruisselbrink.github.io/navigator-connect/
+      // if it's a connect message, then we have to add an acceptConnection method to the event we dispatch.
+      // TO-DO: This should come from the other side, on evt.data.something
+      connectionMessage.targetURL="TO-DO://We.have.to.copy.the.origin.URL.here";
+
+      // We will invoke a onconnect handler here. This onconnect must call acceptCondition(with
+      // a promise or a boolean) and can set an onmessage on the source we pass to it. We must
+      // store that as a reference to process messages at a later point. Again, that would not
+      // be needed if MessageChannel worker. Told you I was going to say that a lot.
+      connectionMessage.source = {
+        postMessage: msg => {
+          // TO-DO/TO-DO: Either here or on sendMessage, we should have a way to distinguish our internal messages. Worst case, we can use the uuid (if it has an uuid field and  a data field it's internal...
+          sendMessage({uuid: evt.data.uuid, data: msg});
+        }
+      };
+
+      // And here we should have a way to tell the parent that hey, we've accepted the connection:
+      connectionMessage.acceptConnection = aPromise => {
+        if (typeof aPromise.then != "function") {
+          // We got a value instead of a promise...
+          aPromise = Promise.resolve(aPromise);
+        }
+        aPromise.then(accepted => sw.postMessage({uuid: evt.data.uuid, data: { accepted: accepted} }));
+      };
+
+      // On this object the onconnect handler add an event listener/set a handler
+      // and it will use it to postMessages to the other side of the connection, so we need
+      // to store it. Again, we wouldn't need to do this if... yeah yeah.
+      _messageChannels[evt.data.uuid] = connectionMessage.source;
+
+      if (sw.onconnect && typeof sw.onconnect == "function") {
+        sw.onconnect(connectionMessage);
+      }
+
+    } else {
+      // This should come from an accepted connection. So evt.data.uuid has the channel id
+      var messageChannel = _messageChannels[evt.data.uuid];
+      if (!messageChannel) {
+        debug("transmitMessage: Didn't get a valid uuid: " + evt.data.uuid);
+        return;
+      }
+      // To-Do: Check that dataToSend has what we expect it to have
+      // Also check if this needs a source or whatever (with the spec!)
+      messageChannel.onmessage && typeof messageChannel.onmessage == "function" &&
+        messageChannel.onmessage(evt.data.dataToSend);
+      // Once again, if MessageChannel worked, this would be a NOP.
+    }
+  }
+
   sw.addEventListener('message', function(evt) {
     debug('****SW***** got a message: ' + JSON.stringify(evt.data));
     if (!isInternalMessage(evt)) {
       return;
     }
-    // types of msg: connect, data
-    //if (sw.onconnect && typeof sw.onconnect == "function") {
-    //  sw.onconnect(data);
-    //}
-    // El mensaje viene de IAC o sea que será crossorigin:
-    var data = evt.dataToSend;  //extractDataFromMessage(evt);
-    var msg = generateResponse(data);
-    debug('sending msg:' + JSON.stringify(msg));
-    sendMessage(msg);
+    var data = transmitMessage(evt);
   });
 
   sw.NCShim = {
