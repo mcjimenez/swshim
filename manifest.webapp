@@ -1,0 +1,26 @@
+{
+  "appcache_path": "./manifest.appcache",
+  "version": "0.1.0",
+  "name": "SW - SHIM - TEST",
+  "description": "Service worker - shim testing",
+  "type": "trusted",
+  "launch_path": "/index.html",
+  "icons": {
+    "16": "/style/icons/icon.png",
+    "48": "/style/icons/icon.png",
+    "60": "/style/icons/icon.png",
+    "128": "/style/icons/icon.png"
+  },
+  "connections": {
+    "https://testServiceConnect.hostedweb.tid.es/services": {
+      "description": "Test SHIM IAC",
+      "rules": {}
+    }
+  },
+  "permissions": {},
+  "installs_allowed_from": [
+    "*"
+  ],
+  "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'"
+}
+
