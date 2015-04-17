@@ -81,27 +81,29 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // and as a MANDATORY field:
   // originURL: The originator of the message
   var sendMessage = function(aMessage) {
-    debug('SHIM SVR sendMessage...');
-    navigator.serviceWorker.ready.then(sw => {
-      debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
-      debug('SHIM SVR creating msg');
-      // We must construct a structure here to indicate our sw partner that
-      aMessage = aMessage || getDefaultMsg();
-      aMessage.uuid = aMessage.uuid || generateNewUUID();
+    return new Promise((resolve, reject) => {
+      debug('SHIM SVR sendMessage...');
+      navigator.serviceWorker.ready.then(sw => {
+        debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
+        debug('SHIM SVR creating msg');
+        // We must construct a structure here to indicate our sw partner that
+        aMessage = aMessage || getDefaultMsg();
+        aMessage.uuid = aMessage.uuid || generateNewUUID();
 
-      var message = {
-        isFromIAC: true,
-        isConnectionRequest: isConnectionRequest(aMessage),
-        uuid: aMessage.uuid,
-        dataToSend: aMessage.data
-      };
-      // This sends the message data as well as transferring messageChannel.port2 to the service worker.
-      // The service worker can then use the transferred port to reply via postMessage(), which
-      // will in turn trigger the onmessage handler on messageChannel.port1.
-      // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
-      debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
-      sw.active && sw.active.postMessage(message);
-      return aMessage.uuid;
+        var message = {
+          isFromIAC: true,
+          isConnectionRequest: isConnectionRequest(aMessage),
+          uuid: aMessage.uuid,
+          dataToSend: aMessage.data
+        };
+        // This sends the message data as well as transferring messageChannel.port2 to the service worker.
+        // The service worker can then use the transferred port to reply via postMessage(), which
+        // will in turn trigger the onmessage handler on messageChannel.port1.
+        // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
+        sw.active && sw.active.postMessage(message);
+        resolve(aMessage.uuid);
+      });
     });
   };
 
@@ -114,7 +116,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   function NavigatorConnectServerIAC() {
     var request = navigator.mozApps.getSelf();
     request.onsuccess = domReq => {
-debug('SHIM SVR onsuccess getSelf');
+debug('SHIM SVR - NavigatorConnectServerIAC - onsuccess getSelf');
       var app = domReq.target.result;
       var manifest  = app.manifest;
       if (!manifest || !manifest.connections) {
@@ -136,7 +138,7 @@ debug('SHIM SVR navigatorserver no tiene connections no poner listener');
     inProgress: false,
 
     onConnection: function (request) {
-      debug('SHIM SVR onConnection -->');
+      debug('SHIM SVR -NavigatorConnectServerIAC- onConnection -->');
       if (connectionsURL.indexOf(request.keyword) < 0) {
         debug('SHIM SVR no urls registered');
         return;
@@ -144,13 +146,12 @@ debug('SHIM SVR navigatorserver no tiene connections no poner listener');
       var port = this.port = request.port;
       debug('SHIM SVR Sending conexion msg');
       // Send a connection request to the service worker
-      var uuid = sendMessage({isConnectionRequest: true, originURL: "AddOriginURLHere", data: null});
-
-      debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
-
-      portTable[uuid] = port;
-      port.onmessage = this.onmessage.bind(this, uuid);
-      port.start();
+      sendMessage({isConnectionRequest: true, originURL: "AddOriginURLHere", data: null}).then(uuid => {
+        debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
+        portTable[uuid] = port;
+        port.onmessage = this.onmessage.bind(this, uuid);
+        port.start();
+      });
     },
 
     onmessage: function(uuid, evt) {
