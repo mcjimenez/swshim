@@ -1,11 +1,11 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC -*- -->" + str);
+  console.log("CJC SHIM SW.js -*- -->" + str);
 }
 
 
-debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
+debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function(sw) {
   // It's not good trying to load this twice
@@ -16,12 +16,12 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   var swCount = 0;
   var ORIGN = 'SW';
 
-  debug('SHIM SW  - Loaded! ');
+  debug(' - Loaded! ');
 
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
-    debug('SHIM SW IsInternalMessage');
+    debug('IsInternalMessage');
     return true;
   }
 
@@ -29,13 +29,13 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 
   function sendMessage(msg) {
-    debug('SHIM SW Dentro sendMessage');
+    debug('Dentro sendMessage');
 
     self.clients.matchAll().then(res => {
       if (!res.length) {
-        debug('SHIM SW Error: no clients are currently controlled.');
+        debug('Error: no clients are currently controlled.');
       } else {
-        debug('SHIM SW Sending...');
+        debug('Sending...');
         res[0].postMessage(msg);
       }
     });
@@ -44,7 +44,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // This function converts the message received to the message format that the
   // onconnect or onmessage handlers expect, and invokes the adequate handler
   function transmitMessage(evt) {
-    debug('SHIM SW executing convertMessage...');
+    debug('executing convertMessage...');
 
     // In theory,
     // evt.ports[0] should correspond to the MessagePort that was transferred as part of
@@ -114,7 +114,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   sw.addEventListener('message', function(evt) {
-    debug('SHIM SW got a message: ' + JSON.stringify(evt.data));
+    debug('****SW***** got a message: ' + JSON.stringify(evt.data));
     if (!isInternalMessage(evt)) {
       return;
     }

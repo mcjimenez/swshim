@@ -41,7 +41,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   }
 
   function registerHandlers() {
-    debug('SHIM SVR -- registerHandlers');
     navConnServerIAC = new NavigatorConnectServerIAC();
 
     debug('SHIM SVR registering a apps handlers');
@@ -151,10 +150,12 @@ debug('SHIM SVR navigatorserver no tiene connections no poner listener');
       portTable[uuid] = port;
       port.onmessage = this.onmessage.bind(this, uuid);
       port.start();
+
+
     },
 
     onmessage: function(uuid, evt) {
-      debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
+console.log("CJC  navigatorServer onmessage --> dentro: " + uuid);
       if (this.inProgress) {
         return;
       }
@@ -165,9 +166,8 @@ debug('SHIM SVR navigatorserver no tiene connections no poner listener');
     }
   };
 
-  debug('SHIM SVR antes registrar  handlers');
+
   navigator.serviceWorker.ready.then(registerHandlers);
-  debug('SHIM SVR despues registrar  handlers');
 
   // This whole object should not be needed, except for tests, if MessageChannel did work.
   // Since it doesn't work for Service Workers, it's needed, sadly.

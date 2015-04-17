@@ -10,7 +10,7 @@ debug('APP carga app.js');
 
   var register = function(evt) {
     debug('APP executing register...');
-    navigator.serviceWorker.register('sw.js', {scope: './'}
+    navigator.serviceWorker.register('/swshim/sw.js', {scope: './'}
     ).then(function(reg) {
       debug('APP Registration succeeded. Scope: ' + reg.scope);
       if (reg.installing) {
@@ -49,19 +49,21 @@ debug('APP carga app.js');
     // from this point on, you would write your handler as if the shim weren't present.
     debug('APP Msg recibido en app');
     for (var kk in evt) {
-      debug("onMesssage -->:"+kk+":"+JSON.stringify(evt[kk]));
+      debug('APP onMesssage -->:' + kk + ':' + JSON.stringify(evt[kk]));
     }
   });
 
   if ('serviceWorker' in navigator) {
+    debug('APP serviceWorker in navigator');
     register();
   } else {
     debug('APP navigator has not ServiceWorker');
     return;
   }
 
+  // Testing purpose only!!!!
   window.addEventListener('load', function () {
-    debug('APP Document loaded!');
+    debug('APP Document loaded! --> registrar handlers de prueba');
     var regBto = document.querySelector('#regBto');
     var unRegBto = document.querySelector('#unregBto');
     var sendMessageBto = document.querySelector('#sendMsgBto');
