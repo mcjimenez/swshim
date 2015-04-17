@@ -1,44 +1,39 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC APP -*-:" + str);
+  console.log("CJC -*-:" + str);
 }
 
-debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
+debug('APP carga app.js');
 
 (function() {
 
-  if (!('serviceWorker' in navigator)) {
-    debug('navigator has not ServiceWorker');
-    return;
-  }
-
   var register = function(evt) {
-    debug('executing register...');
+    debug('APP executing register...');
     navigator.serviceWorker.register('sw.js', {scope: './'}
     ).then(function(reg) {
-      debug('Registration succeeded. Scope: ' + reg.scope);
+      debug('APP Registration succeeded. Scope: ' + reg.scope);
       if (reg.installing) {
-        debug('registration --> installing');
+        debug('APP registration --> installing');
       } else if (reg.waiting) {
-        debug('registration --> waiting');
+        debug('APP registration --> waiting');
       } else if (reg.active) {
-        debug('registration --> active');
-        debug('setting client\'s msg handler');
+        debug('APP registration --> active');
+        debug('APP setting client\'s msg handler');
       }
       // Reload document... (yep sucks!)
       location.reload();
     }).catch(function(error) {
-      debug('Registration failed with ' + error);
+      debug('APP Registration failed with ' + error);
     });
   };
 
   var unregister = function(evt) {
-    debug('Unregister...');
+    debug('APP Unregister...');
     navigator.serviceWorker.getRegistrations().then(regs => {
       regs.forEach(reg => {
         reg.unregister();
-        debug('Unregister done');
+        debug('APP Unregister done');
       });
     });
   };
@@ -52,14 +47,21 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
     }
 
     // from this point on, you would write your handler as if the shim weren't present.
-    debug('Msg recibido en app');
+    debug('APP Msg recibido en app');
     for (var kk in evt) {
       debug("onMesssage -->:"+kk+":"+JSON.stringify(evt[kk]));
     }
   });
 
+  if ('serviceWorker' in navigator) {
+    register();
+  } else {
+    debug('APP navigator has not ServiceWorker');
+    return;
+  }
+
   window.addEventListener('load', function () {
-    debug('Document loaded!');
+    debug('APP Document loaded!');
     var regBto = document.querySelector('#regBto');
     var unRegBto = document.querySelector('#unregBto');
     var sendMessageBto = document.querySelector('#sendMsgBto');
