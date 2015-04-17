@@ -15,8 +15,8 @@ debug('APP carga app.js');
       debug('APP Registration succeeded. Scope: ' + reg.scope);
       if (reg.installing) {
         debug('APP registration --> installing');
-	// Reload document... (yep sucks!)
-	location.reload();
+	      // Reload document... (yep sucks!)
+	      location.reload();
       } else if (reg.waiting) {
         debug('APP registration --> waiting');
       } else if (reg.active) {

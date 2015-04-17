@@ -4,7 +4,7 @@ function debug(str) {
   console.log('CJC -*- -->' + str);
 }
 
-//this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
+this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
 debug('importScripts executed (hopefully)!');
 
 this.addEventListener('install', function(evt) {
@@ -19,7 +19,6 @@ this.addEventListener('fetch', function(evt) {
   debug('fetch event');
 });
 
-/*
 this.onconnect = function(msg) {
   debug("onconnect event");
   debug("onconnect: We should have a port here on msg.source: " + msg.source);
@@ -39,6 +38,6 @@ this.addEventListener('message', function(evt) {
   // Your code here
   debug("We got a message for us!");
 });
-*/
+
 
 
