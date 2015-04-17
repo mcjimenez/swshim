@@ -1,10 +1,10 @@
 {
-  "appcache_path": "./manifest.appcache",
+  "appcache_path": "/swshim/manifest.appcache",
   "version": "0.1.0",
   "name": "SW - SHIM - TEST",
   "description": "Service worker - shim testing",
   "type": "trusted",
-  "launch_path": "/index.html",
+  "launch_path": "/swshim/index.html",
   "icons": {
     "16": "/style/icons/icon.png",
     "48": "/style/icons/icon.png",
@@ -20,7 +20,6 @@
   "permissions": {},
   "installs_allowed_from": [
     "*"
-  ],
-  "csp": "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'"
+  ]
 }
 
