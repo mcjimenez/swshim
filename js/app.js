@@ -15,14 +15,14 @@ debug('APP carga app.js');
       debug('APP Registration succeeded. Scope: ' + reg.scope);
       if (reg.installing) {
         debug('APP registration --> installing');
+	// Reload document... (yep sucks!)
+	location.reload();
       } else if (reg.waiting) {
         debug('APP registration --> waiting');
       } else if (reg.active) {
         debug('APP registration --> active');
         debug('APP setting client\'s msg handler');
       }
-      // Reload document... (yep sucks!)
-      location.reload();
     }).catch(function(error) {
       debug('APP Registration failed with ' + error);
     });
