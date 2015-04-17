@@ -5,18 +5,18 @@ function debug(str) {
 }
 
 this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
-debug('importScripts executed (hopefully)!');
+debug('SW importScripts executed (hopefully)!');
 
 this.addEventListener('install', function(evt) {
-  debug('Install event');
+  debug('SW Install event');
 });
 
 this.addEventListener('activate', function(evt) {
-  debug('activate event');
+  debug('SW activate event');
 });
 
 this.addEventListener('fetch', function(evt) {
-  debug('fetch event');
+  debug('SW fetch event');
 });
 
 this.onconnect = function(msg) {

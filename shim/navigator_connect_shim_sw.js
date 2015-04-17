@@ -1,11 +1,11 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC SHIM SW.js -*- -->" + str);
+  console.log("CJC -*- -->" + str);
 }
 
 
-debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
+debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 (function(sw) {
   // It's not good trying to load this twice
@@ -16,12 +16,12 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   var swCount = 0;
   var ORIGN = 'SW';
 
-  debug(' - Loaded! ');
+  debug('SHIM SW  - Loaded! ');
 
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
-    debug('IsInternalMessage');
+    debug('SHIM SW IsInternalMessage');
     return true;
   }
 
@@ -29,13 +29,13 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
 
   function sendMessage(msg) {
-    debug('Dentro sendMessage');
+    debug('SHIM SW Dentro sendMessage');
 
     self.clients.matchAll().then(res => {
       if (!res.length) {
-        debug('Error: no clients are currently controlled.');
+        debug('SHIM SW Error: no clients are currently controlled.');
       } else {
-        debug('Sending...');
+        debug('SHIM SW Sending...');
         res[0].postMessage(msg);
       }
     });
@@ -44,7 +44,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // This function converts the message received to the message format that the
   // onconnect or onmessage handlers expect, and invokes the adequate handler
   function transmitMessage(evt) {
-    debug('executing convertMessage...');
+    debug('SHIM SW executing convertMessage...');
 
     // In theory,
     // evt.ports[0] should correspond to the MessagePort that was transferred as part of
@@ -114,7 +114,7 @@ debug('Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   sw.addEventListener('message', function(evt) {
-    debug('****SW***** got a message: ' + JSON.stringify(evt.data));
+    debug('SHIM SW ****SW***** got a message: ' + JSON.stringify(evt.data));
     if (!isInternalMessage(evt)) {
       return;
     }
