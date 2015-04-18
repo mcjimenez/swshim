@@ -44,7 +44,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // This function converts the message received to the message format that the
   // onconnect or onmessage handlers expect, and invokes the adequate handler
   function transmitMessage(evt) {
-    debug('SHIM SW executing convertMessage...');
+    debug('SHIM SW executing transmitMessage...');
 
     // In theory,
     // evt.ports[0] should correspond to the MessagePort that was transferred as part of
@@ -61,7 +61,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
     // Maybe we would need to do something with this...
     if (evt.data.isConnectionRequest) {
-      debug('SHIM SW - connection msg');
+      debug('SHIM SW - isConnectionRequest msg');
       var connectionMessage = evt.data.dataToSend;
       // We need to construct here what we will pass to onconnect, based on what we have received
       // onconnect will need a way to return data to the source
@@ -74,7 +74,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // a promise or a boolean) and can set an onmessage on the source we pass to it. We must
       // store that as a reference to process messages at a later point. Again, that would not
       // be needed if MessageChannel worker. Told you I was going to say that a lot.
-      debug('creating connectionMessage');
+      debug('SHIM SW *********** creating connectionMessage');
       connectionMessage.source = {
         postMessage: msg => {
           // TO-DO/TO-DO: Either here or on sendMessage, we should have a way to distinguish our internal messages. Worst case, we can use the uuid (if it has an uuid field and  a data field it's internal...
@@ -101,6 +101,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       }
 
     } else {
+      debug('SHIM SW - NOOO isConnectionRequest msg');
       // This should come from an accepted connection. So evt.data.uuid has the channel id
       var messageChannel = _messageChannels[evt.data.uuid];
       if (!messageChannel) {
