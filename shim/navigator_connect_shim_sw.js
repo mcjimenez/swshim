@@ -1,7 +1,7 @@
 'use strict';
 
 function debug(str) {
-  console.log("CJC -*- -->" + str);
+  console.log("CJC -*-:" + str);
 }
 
 
@@ -61,8 +61,8 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
     // Maybe we would need to do something with this...
     if (evt.data.isConnectionRequest) {
-      debug('SHIM SW - isConnectionRequest msg');
-      var connectionMessage = evt.data.dataToSend;
+      debug('SHIM SW - isConnectionRequest msg evt.data:'+JSON.stringify(evt.data));
+      var connectionMessage = evt.data.dataToSend || {};
       // We need to construct here what we will pass to onconnect, based on what we have received
       // onconnect will need a way to return data to the source
       // http://mkruisselbrink.github.io/navigator-connect/
