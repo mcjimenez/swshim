@@ -69,11 +69,12 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // if it's a connect message, then we have to add an acceptConnection method to the event we dispatch.
       // TO-DO: This should come from the other side, on evt.data.something
       connectionMessage.targetURL="TO-DO://We.have.to.copy.the.origin.URL.here";
-
+      debug('SHIM SW - PTO 1*************');
       // We will invoke a onconnect handler here. This onconnect must call acceptCondition(with
       // a promise or a boolean) and can set an onmessage on the source we pass to it. We must
       // store that as a reference to process messages at a later point. Again, that would not
       // be needed if MessageChannel worker. Told you I was going to say that a lot.
+      debug('SHIM SW - PTO 2*************');
       debug('SHIM SW *********** creating connectionMessage');
       connectionMessage.source = {
         postMessage: msg => {
