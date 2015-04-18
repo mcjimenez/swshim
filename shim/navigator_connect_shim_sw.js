@@ -21,7 +21,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
-    debug('SHIM SW IsInternalMessage' + aMessage && !!aMessage.isFromIAC);
+    debug('SHIM SW IsInternalMessage:' + (aMessage && !!aMessage.isFromIAC));
     return aMessage && !!aMessage.isFromIAC;
   }
 
@@ -118,6 +118,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   sw.addEventListener('message', function(evt) {
     debug('SHIM SW ****SW***** got a message: ' + JSON.stringify(evt.data));
     if (!isInternalMessage(evt)) {
+      debug('SHIM SW no es intenal msg');
       return;
     }
     var data = transmitMessage(evt);
