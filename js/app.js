@@ -61,15 +61,22 @@ debug('APP carga app.js');
     return;
   }
 
+  function connectionMSg() {
+    var event = new CustomEvent('connection', { 'detail': 'noDAtas'});
+    window.dispatchEvent(event);
+  }
+
   // Testing purpose only!!!!
   window.addEventListener('load', function () {
     debug('APP Document loaded! --> registrar handlers de prueba');
     var regBto = document.querySelector('#regBto');
     var unRegBto = document.querySelector('#unregBto');
     var sendMessageBto = document.querySelector('#sendMsgBto');
+    var connBto = document.querySelector('#connMsgMto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
     sendMessageBto.addEventListener('click', NCShim.sendMessage.bind(null, undefined));
+    connBto.addEventListener('click', connectionMSg);
   });
 
 })(self);
