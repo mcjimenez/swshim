@@ -8,11 +8,15 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
 (function(exports) {
 
+  if (window.NCShim) {
+    debug('window.NCShim ya existe');
+    return;
+  }
+
   var cltCount = 0;
   var ORIGN = 'clt';
 
   var connections = {};
-  var connectionsURL = [];
   var handlerSet = false;
   var navConnServerIAC = null;
 
@@ -42,7 +46,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
   function registerHandlers() {
     debug('SHIM SVR -- registerHandlers');
-    navConnServerIAC = new NavigatorConnectServerIAC();
+    navConnServerIAC = NavigatorConnectServerIAC.getInstance();
 
     debug('SHIM SVR registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
@@ -115,58 +119,76 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   };
 
   // Creating listener IAC
-  function NavigatorConnectServerIAC() {
-    var request = navigator.mozApps.getSelf();
-    request.onsuccess = domReq => {
-      debug('SHIM SVR - NavigatorConnectServerIAC - onsuccess getSelf');
-      var app = domReq.target.result;
-      var manifest  = app.manifest;
-      if (!manifest || !manifest.connections) {
-        debug('SHIM SVR navigatorserver no tiene connections no poner listener');
-        connectionsURL = [];
-        return;
-      }
-      for (var key in manifest.connections) {
-        connectionsURL.push(key);
-      }
-      //only if we've defined connections we need to put the handler
-      if (connectionsURL.length > 0) {
-        navigator.mozSetMessageHandler('connection', this.onConnection.bind(this));
+  var NavigatorConnectServerIAC = (function() {
+    var instance = null;
+
+    function IAC() {
+      debug('SHIM - SVR --> fc IAC');
+      this.connectionsURL = [];
+
+      var request = navigator.mozApps.getSelf();
+      request.onsuccess = domReq => {
+        debug('SHIM SVR - NavigatorConnectServerIAC - onsuccess getSelf');
+        var app = domReq.target.result;
+        var manifest  = app.manifest;
+        if (!manifest || !manifest.connections) {
+          debug('SHIM SVR navigatorserver no tiene connections no poner listener');
+          this.connectionsURL = [];
+          return;
+        }
+        for (var key in manifest.connections) {
+          this.connectionsURL.push(key);
+        }
+        //only if we've defined connections we need to put the handler
+        if (this.connectionsURL.length > 0) {
+          navigator.mozSetMessageHandler('connection', this.onConnection.bind(this));
+        }
+      };
+    }
+    IAC.prototype = {
+      inProgress: false,
+
+      onConnection: function (request) {
+        debug('SHIM SVR -NavigatorConnectServerIAC- onConnection -->');
+        if (this.connectionsURL.indexOf(request.keyword) < 0) {
+          debug('SHIM SVR no urls registered');
+          return;
+        }
+        var port = this.port = request.port;
+        debug('SHIM SVR Sending conexion msg');
+        // Send a connection request to the service worker
+        sendMessage({ isConnectionRequest: true,
+                      originURL: "AddOriginURLHere",
+                      data: null}).then(uuid => {
+          debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
+          portTable[uuid] = port;
+          port.onmessage = this.onmessage.bind(this, uuid);
+          port.start();
+        });
+      },
+      onmessage: function(uuid, evt) {
+        debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
+        if (this.inProgress) {
+          return;
+        }
+
+        this.inProgress = true;
+        sendMessage({originURL: "AddOriginURLHere", data: evt.data, uuid: uuid});
+        this.inProgress = false;
       }
     };
-  }
 
-  NavigatorConnectServerIAC.prototype = {
-    inProgress: false,
-
-    onConnection: function (request) {
-      debug('SHIM SVR -NavigatorConnectServerIAC- onConnection -->');
-      if (connectionsURL.indexOf(request.keyword) < 0) {
-        debug('SHIM SVR no urls registered');
-        return;
+    return {
+      getInstance: function() {
+        if (!instance) {
+          debug('SHIM SVR instancia IAC no creada');
+          instance = new IAC();
+        }
+        debug('SHIM SVR devolver instancia');
+        return instance;
       }
-      var port = this.port = request.port;
-      debug('SHIM SVR Sending conexion msg');
-      // Send a connection request to the service worker
-      sendMessage({isConnectionRequest: true, originURL: "AddOriginURLHere", data: null}).then(uuid => {
-        debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
-        portTable[uuid] = port;
-        port.onmessage = this.onmessage.bind(this, uuid);
-        port.start();
-      });
-    },
-
-    onmessage: function(uuid, evt) {
-      debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
-      if (this.inProgress) {
-        return;
-      }
-
-      this.inProgress = true;
-      sendMessage({originURL: "AddOriginURLHere", data: evt.data, uuid: uuid});
-      this.inProgress = false;
-    }
-  };
+    };
+  })();
 
   debug('SHIM SVR antes registrar  handlers');
   navigator.serviceWorker.ready.then(registerHandlers);
