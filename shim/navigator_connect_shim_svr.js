@@ -8,9 +8,11 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
 (function(exports) {
 
-  if (window.NCShim) {
+  if (exports.NCShim) {
     debug('window.NCShim ya existe');
     return;
+  } else {
+    debug('window.NCShim NOOO existe');
   }
 
   var cltCount = 0;
