@@ -21,6 +21,9 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
+for (var i in aMessage){
+  debug(i+':'+JSON.stringify(aMessage[i]));
+}
     debug('SHIM SW IsInternalMessage:' + (aMessage && !!aMessage.isFromIAC));
     return aMessage && !!aMessage.isFromIAC;
   }
