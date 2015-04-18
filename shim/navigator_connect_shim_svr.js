@@ -59,10 +59,12 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // Returns true if the message (from IAC) is a connection request,
   // false otherwise.
   var isConnectionRequest = function(message) {
+    debug('SHIM SVR - isConnectionRequest:' + message.isConnectionRequest);
     return message.isConnectionRequest;
   };
 
   var getDefaultMsg = function() {
+    debug('SHIM SVR - getDefaultMsg');
     return {
       isConnectionRequest: true,
       data: {
@@ -82,7 +84,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // originURL: The originator of the message
   var sendMessage = function(aMessage) {
     return new Promise((resolve, reject) => {
-      debug('SHIM SVR sendMessage...');
+      debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):'No received msg to send'));
       navigator.serviceWorker.ready.then(sw => {
         debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
         debug('SHIM SVR creating msg');
@@ -116,11 +118,11 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   function NavigatorConnectServerIAC() {
     var request = navigator.mozApps.getSelf();
     request.onsuccess = domReq => {
-debug('SHIM SVR - NavigatorConnectServerIAC - onsuccess getSelf');
+      debug('SHIM SVR - NavigatorConnectServerIAC - onsuccess getSelf');
       var app = domReq.target.result;
       var manifest  = app.manifest;
       if (!manifest || !manifest.connections) {
-debug('SHIM SVR navigatorserver no tiene connections no poner listener');
+        debug('SHIM SVR navigatorserver no tiene connections no poner listener');
         connectionsURL = [];
         return;
       }

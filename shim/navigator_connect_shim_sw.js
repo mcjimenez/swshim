@@ -21,8 +21,8 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
-    debug('SHIM SW IsInternalMessage');
-    return true;
+    debug('SHIM SW IsInternalMessage' + aMessage && !!aMessage.isFromIAC);
+    return aMessage && !!aMessage.isFromIAC;
   }
 
   var _messageChannels = {};
@@ -61,6 +61,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
     // Maybe we would need to do something with this...
     if (evt.data.isConnectionRequest) {
+      debug('SHIM SW - connection msg');
       var connectionMessage = evt.data.dataToSend;
       // We need to construct here what we will pass to onconnect, based on what we have received
       // onconnect will need a way to return data to the source
@@ -73,6 +74,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // a promise or a boolean) and can set an onmessage on the source we pass to it. We must
       // store that as a reference to process messages at a later point. Again, that would not
       // be needed if MessageChannel worker. Told you I was going to say that a lot.
+      debug('creating connectionMessage');
       connectionMessage.source = {
         postMessage: msg => {
           // TO-DO/TO-DO: Either here or on sendMessage, we should have a way to distinguish our internal messages. Worst case, we can use the uuid (if it has an uuid field and  a data field it's internal...
