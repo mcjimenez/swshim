@@ -134,7 +134,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         if (!manifest || !manifest.connections) {
           debug('SHIM SVR navigatorserver no tiene connections no poner listener');
           this.connectionsURL = [];
-          return;
         }
         for (var key in manifest.connections) {
           this.connectionsURL.push(key);
@@ -145,6 +144,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         }
       };
     }
+
     IAC.prototype = {
       inProgress: false,
 
@@ -155,7 +155,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           return;
         }
         var port = this.port = request.port;
-        debug('SHIM SVR Sending conexion msg');
+        debug('SHIM SVR IAC Sending conexion msg');
         // Send a connection request to the service worker
         sendMessage({ isConnectionRequest: true,
                       originURL: "AddOriginURLHere",
