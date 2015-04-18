@@ -22,10 +22,10 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   var handlerSet = false;
   var navConnServerIAC = null;
 
-  // To store the list of ports we've accepted... Note that at this point we're not multiplexing navigator.connect connections over IAC connections
+  // To store the list of ports we've accepted... Note that at this point we're
+  // not multiplexing navigator.connect connections over IAC connections
   // Although we could do that also.
   var portTable = {};
-
 
   function generateNewUUID() {
     var d = new Date().getTime();
@@ -39,11 +39,11 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     return uuid;
   }
 
-  // To-DO!
   function sendMessageByIAC(evt) {
-    debug("sendMessageByIAC not implemented yet!");
+    debug("SHIM SVR sendMessageByIAC");
     // evt.data.uuid has the uuid of the port we should use to send the data...
-    portTable[evt.data.uuid] && portTable[evt.data.uuid].postMessage(evt.data.data);
+    portTable[evt.data.uuid] &&
+      portTable[evt.data.uuid].postMessage(evt.data.data);
   }
 
   function registerHandlers() {
@@ -57,7 +57,8 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
       }
       console.log('*** APP***  recibe un msg!!');
       console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
-      // Here we have to pass this message to the other side of the IAC connection...
+      // Here we have to pass this message to the other side of the
+      // IAC connection...
       sendMessageByIAC(evt);
     });
   }
@@ -83,9 +84,11 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
   // Msg from app to sw.
   // aMessage can have, as optional fields:
-  // isConnectionRequest: True if it's a connection request, false if it's a message
+  // isConnectionRequest: True if it's a connection request,
+  //                      false if it's a message
   // data: The data from the originator
-  // uuid: The uuid of the virtual channel to use, or null/undefined to create a new channel
+  // uuid: The uuid of the virtual channel to use, or null/undefined to create a
+  //       new channel
   // and as a MANDATORY field:
   // originURL: The originator of the message
   var sendMessage = function(aMessage) {
@@ -104,10 +107,13 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           uuid: aMessage.uuid,
           dataToSend: aMessage.data
         };
-        // This sends the message data as well as transferring messageChannel.port2 to the service worker.
-        // The service worker can then use the transferred port to reply via postMessage(), which
-        // will in turn trigger the onmessage handler on messageChannel.port1.
-        // See https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        // This sends the message data as well as transferring
+        // messageChannel.port2 to the service worker.
+        // The service worker can then use the transferred port to reply via
+        // postMessage(), which will in turn trigger the onmessage handler on
+        // messageChannel.port1.
+        // See
+        // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
         sw.active && sw.active.postMessage(message);
         resolve(aMessage.uuid);
@@ -115,7 +121,8 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     });
   };
 
-  // TO-DO: Distinguish when a message from the SW is internal of navigator.connect or not
+  // Distinguish when a message from the SW is internal of
+  // navigator.connect or not
   function isInternalMessage(evt) {
     return evt.data.uuid;
   };
@@ -142,7 +149,8 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         }
         //only if we've defined connections we need to put the handler
         if (this.connectionsURL.length > 0) {
-          navigator.mozSetMessageHandler('connection', this.onConnection.bind(this));
+          navigator.mozSetMessageHandler('connection',
+                                         this.onConnection.bind(this));
         }
       };
     }
@@ -160,7 +168,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         debug('SHIM SVR IAC Sending conexion msg');
         // Send a connection request to the service worker
         sendMessage({ isConnectionRequest: true,
-                      originURL: "AddOriginURLHere",
+                      originURL: 'AddOriginURLHere',
                       data: null}).then(uuid => {
           debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
           portTable[uuid] = port;
@@ -175,7 +183,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         }
 
         this.inProgress = true;
-        sendMessage({originURL: "AddOriginURLHere", data: evt.data, uuid: uuid});
+        sendMessage({ originURL: 'AddOriginURLHere',
+                      data: evt.data,
+                      uuid: uuid});
         this.inProgress = false;
       }
     };
@@ -196,7 +206,8 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   navigator.serviceWorker.ready.then(registerHandlers);
   debug('SHIM SVR despues registrar  handlers');
 
-  // This whole object should not be needed, except for tests, if MessageChannel did work.
+  // This whole object should not be needed, except for tests, if
+  // MessageChannel did work.
   // Since it doesn't work for Service Workers, it's needed, sadly.
   exports.NCShim = {
     // sendMessage exported only for tests!
