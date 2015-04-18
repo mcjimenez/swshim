@@ -106,6 +106,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       _messageChannels[evt.data.uuid] = connectionMessage.source;
 
       if (sw.onconnect && typeof sw.onconnect == "function") {
+        debug('SHIM SW ej onConnect with --> ' + JSON.stringify(connectionMessage));
         sw.onconnect(connectionMessage);
       }
 
