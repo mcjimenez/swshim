@@ -29,10 +29,10 @@ this.onconnect = function(msg) {
   // msg.source should have the endpoint to send and receive messages,
   // so we can do:
   msg.acceptConnection(true);
-  msg.source.onmessage = function(msg) {
-    debug("SW Got a message from one of the accepted connections: " + JSON.stringify(msg));
+  msg.source.onmessage = function(aMsg) {
+    debug("SW Got a message from one of the accepted connections: " + JSON.stringify(aMsg));
     // TO-DO HERE! ANSWER THE MESSAGE!
-    msg.source.postMessage("Hello, client! I got your request: " + JSON.stringify(msg));
+    msg.source.postMessage("Hello, client! I got your request: " + JSON.stringify(aMsg));
   };
 };
 
