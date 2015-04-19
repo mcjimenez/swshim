@@ -187,8 +187,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         // Wait for the first message before sending anything to the service
         // worker.
         // The first message received will hold the origin URL
-        port.onmessage = function(aMessage) {
-          debug("SHIM SVR: 1st port.onmessage: " + JSON.stringify(aMessage) + ", " + JSON.stringify(aMessage.data));
+        port.onmessage = aMessage => {
+          debug('SHIM SVR: 1st port.onmessage: ' + JSON.stringify(aMessage) +
+                ', ' + JSON.stringify(aMessage.data));
           var originURL = aMessage.data.originURL;
           sendMessage({ isConnectionRequest: true,
                         originURL: originURL,
