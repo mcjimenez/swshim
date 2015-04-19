@@ -113,6 +113,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           isFromIAC: true,
           isConnectionRequest: isConnectionRequest(aMessage),
           uuid: aMessage.uuid,
+          originURL: aMessage.originURL,
           dataToSend: aMessage.data
         };
 
@@ -187,6 +188,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         // worker.
         // The first message received will hold the origin URL
         port.onmessage = function(aMessage) {
+          debug("SHIM SVR: 1st port.onmessage: " + JSON.stringify(aMessage) + ", " + JSON.stringify(aMessage.data));
           var originURL = aMessage.data.originURL;
           sendMessage({ isConnectionRequest: true,
                         originURL: originURL,
