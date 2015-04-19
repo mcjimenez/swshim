@@ -172,6 +172,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
       inProgress: false,
 
       onConnection: function (request) {
+      for(var kk in request) {
+      debug('SHIM svr reques onconnection:'+kk+':'+request[kk]); 
+      }
         debug('SHIM SVR -NavigatorConnectServerIAC- onConnection -->');
         if (this.connectionsURL.indexOf(request.keyword) < 0) {
           debug('SHIM SVR no urls registered');
