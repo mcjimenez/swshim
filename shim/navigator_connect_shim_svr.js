@@ -20,13 +20,14 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
   var connections = {};
   var handlerSet = false;
-  var navConnServerIAC = null;
 
   // To store the list of ports we've accepted... Note that at this point we're
   // not multiplexing navigator.connect connections over IAC connections
   // Although we could do that also.
   var portTable = {};
 
+  // Generates an UUID. This function is not cryptographically robust, but at
+  // this moment this doesn't matter that much.
   function generateNewUUID() {
     var d = new Date().getTime();
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
@@ -39,6 +40,8 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     return uuid;
   }
 
+  // Sends a message received from the service worker to the client of the
+  // connection using IAC as the transport mechanism
   function sendMessageByIAC(evt) {
     debug("SHIM SVR sendMessageByIAC. " + JSON.stringify(evt.data));
     // evt.data.uuid has the uuid of the port we should use to send the data...
@@ -48,7 +51,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
   function registerHandlers() {
     debug('SHIM SVR -- registerHandlers');
-    navConnServerIAC = NavigatorConnectServerIAC.getInstance();
+    NavigatorConnectServerIAC.start();
 
     debug('SHIM SVR registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
@@ -70,6 +73,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     return (message && message.isConnectionRequest ? true : false);
   };
 
+  // Returns a default, test, connection message. Normally connection messages
+  // will only include connection data (such as the origin), and not any client
+  // data.
   var getDefaultMsg = function() {
     debug('SHIM SVR - getDefaultMsg');
     return {
@@ -86,18 +92,20 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // aMessage can have, as optional fields:
   // isConnectionRequest: True if it's a connection request,
   //                      false if it's a message
-  // data: The data from the originator
+  // data: The data that the original message had
   // uuid: The uuid of the virtual channel to use, or null/undefined to create a
   //       new channel
   // and as a MANDATORY field:
   // originURL: The originator of the message
   var sendMessage = function(aMessage) {
     return new Promise((resolve, reject) => {
-      debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):'No received msg to send'));
+      debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):'No'
+                                         + ' received msg to send'));
       navigator.serviceWorker.ready.then(sw => {
         debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
         debug('SHIM SVR creating msg');
         // We must construct a structure here to indicate our sw partner that
+        // we got a message and how to answer it.
         aMessage = aMessage || getDefaultMsg();
         aMessage.uuid = aMessage.uuid || generateNewUUID();
 
@@ -107,14 +115,17 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           uuid: aMessage.uuid,
           dataToSend: aMessage.data
         };
+
         debug('SHIM SVR --> msg creado:'+JSON.stringify(message));
-        // This sends the message data as well as transferring
+
+        // This should sends the message data as well as transferring
         // messageChannel.port2 to the service worker.
         // The service worker can then use the transferred port to reply via
         // postMessage(), which will in turn trigger the onmessage handler on
         // messageChannel.port1.
         // See
         // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        // Unfortunately, that does not work on Gecko currently
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
         sw.active && sw.active.postMessage(message);
         resolve(aMessage.uuid);
@@ -123,14 +134,15 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   };
 
   // Distinguish when a message from the SW is internal of
-  // navigator.connect or not
+  // navigator.connect or not. Currently we just check if the message includes
+  // an uuid or not.
   function isInternalMessage(evt) {
     return evt.data.uuid;
   };
 
-  // Creating listener IAC
+  // Create a listener service for the IAC messages.
   var NavigatorConnectServerIAC = (function() {
-    var instance = null;
+    var started = false;
 
     function IAC() {
       debug('SHIM - SVR --> fc IAC');
@@ -166,39 +178,40 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           return;
         }
         var port = this.port = request.port;
+        // TO-DO: Fetch the URL of the originator!
+        var originURL = 'AddOriginURLHere';
         debug('SHIM SVR IAC Sending conexion msg');
         // Send a connection request to the service worker
         sendMessage({ isConnectionRequest: true,
-                      originURL: 'AddOriginURLHere',
+                      originURL: originURL,
                       data: null}).then(uuid => {
-          debug('SHIM SVR enviado msg de conexion --> uuid:' + uuid);
+          debug('SHIM SVR sent connection message with uuid:' + uuid);
+
+          // TO-DO: This should be done only when the connection is actually
+          // accepted. We don't want to send messages to the SW otherwise
           portTable[uuid] = port;
-          port.onmessage = this.onmessage.bind(this, uuid);
+          port.onmessage = this.onmessage.bind(this, uuid, originURL);
           port.start();
         });
       },
-      onmessage: function(uuid, evt) {
-        debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
-        if (this.inProgress) {
-          return;
-        }
 
-        this.inProgress = true;
-        sendMessage({ originURL: 'AddOriginURLHere',
+      onmessage: function(uuid, originURL, evt) {
+        debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
+
+        sendMessage({ originURL: originURL,
                       data: evt.data,
                       uuid: uuid});
-        this.inProgress = false;
       }
     };
 
     return {
-      getInstance: function() {
-        if (!instance) {
-          debug('SHIM SVR instancia IAC no creada');
-          instance = new IAC();
+      start: function() {
+        if (!started) {
+          debug('SHIM SVR initializing IAC server');
+          // Yes, it sucks. I'll change it
+          new IAC();
+          started = true;
         }
-        debug('SHIM SVR devolver instancia');
-        return instance;
       }
     };
   })();

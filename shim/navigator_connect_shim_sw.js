@@ -13,7 +13,6 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   var swCount = 0;
-  var ORIGN = 'SW';
 
   debug('SHIM SW  - Loaded! ');
 
@@ -21,11 +20,13 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
     debug('SHIM SW IsInternalMessage:' + (aMessage && !!aMessage.data.isFromIAC));
-    return aMessage && aMessage.data && !!aMessage.data.isFromIAC;
+    return !!(aMessage && aMessage.data && aMessage.data.isFromIAC);
   }
 
   var _messageChannels = {};
 
+  // Sends a message from the SW to the main thread. This would not be needed if
+  // MessageChannel worked... Yep, you're going to read this a lot.
   function sendMessage(msg) {
     debug('SHIM SW Dentro sendMessage --> ' + JSON.stringify(msg));
 
@@ -67,8 +68,8 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // http://mkruisselbrink.github.io/navigator-connect/
       // if it's a connect message, then we have to add an acceptConnection
       // method to the event we dispatch.
-      // TO-DO: This should come from the other side, on evt.data.something
-      connectionMessage.targetURL="TO-DO://We.have.to.copy.the.origin.URL.here";
+      connectionMessage.targetURL = evt.data.originURL;
+
       // We will invoke a onconnect handler here. This onconnect must call
       // acceptCondition(with a promise or a boolean) and can set an onmessage
       // on the source we pass to it. We must store that as a reference to
@@ -77,9 +78,9 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       debug('SHIM SW creating connectionMessage');
       connectionMessage.source = {
         postMessage: msg => {
-          // TO-DO/TO-DO: Either here or on sendMessage, we should have a way to
-          // distinguish our internal messages. Worst case, we can use the uuid
-          // (if it has an uuid field and a data field it's internal...
+          // Either here or on sendMessage, we should have a way to
+          // distinguish our internal messages. Currently we're using the uuid
+          // (if it has an uuid field and a data field it's internal)
           debug('connectionMessage.source.postMessage');
           sendMessage({uuid: evt.data.uuid, data: msg});
         }
@@ -93,13 +94,21 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
           // We got a value instead of a promise...
           aPromise = Promise.resolve(aPromise);
         }
-        aPromise.then(accepted =>{
-              debug('CJC then de acceptConncetion accepted:'+accepted);
-                                  sendMessage({ uuid: evt.data.uuid,
-                                                data: {
-                                                  accepted: accepted
-                                                }
-                                              });});
+        aPromise.then(accepted => {
+          debug('SHIM SW then for acceptConnection accepted:'+accepted);
+          sendMessage({ uuid: evt.data.uuid,
+                        data: {
+                          accepted: accepted
+                        }
+          });
+          // Now if we've *not* accepted the connection, we can clean up here
+          if (!accepted) {
+            delete _messageChannels[evt.data.uuid];
+            // Just in case someone kept this. We could check this also on the
+            // original postMessage function.
+            connectionMessage.source.postMessage = function() {};
+          }
+        });
       };
 
       // On this object the onconnect handler add an event listener/set a
@@ -109,12 +118,12 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       _messageChannels[evt.data.uuid] = connectionMessage.source;
 
       if (sw.onconnect && typeof sw.onconnect == "function") {
-        debug('SHIM SW ej onConnect with --> ' + JSON.stringify(connectionMessage));
+        debug('SHIM SW executing onConnect with --> ' + JSON.stringify(connectionMessage));
         sw.onconnect(connectionMessage);
       }
 
     } else {
-      debug('SHIM SW - NOOO isConnectionRequest msg');
+      debug('SHIM SW - msg with isConnectionRequest false');
       // This should come from an accepted connection. So evt.data.uuid has the
       // channel id
       var messageChannel = _messageChannels[evt.data.uuid];
@@ -132,9 +141,9 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   }
 
   sw.addEventListener('message', function(evt) {
-    debug('SHIM SW ****SW***** got a message: ' + JSON.stringify(evt.data));
+    debug('SHIM SW got a message: ' + JSON.stringify(evt.data));
     if (!isInternalMessage(evt)) {
-      debug('SHIM SW no es intenal msg');
+      debug('SHIM SW not an internal msg, ignoring');
       return;
     }
     var data = transmitMessage(evt);

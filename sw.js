@@ -1,10 +1,20 @@
 'use strict';
 
+// This is a very basic sample Service Worker (SW) that  acts as a server for
+// navigator.connect. I'm going to mark with a comment where the app MUST
+// add some extra code to use the navigator.connect SHIM
+// So if you just want to know that, search for:
+// ADDED FOR SHIM
+
+
 function debug(str) {
   console.log('CJC -*- -->' + str);
 }
 
+// ADDED FOR SHIM: Import the shim script
 this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
+// END ADDED FOR SHIM
+
 debug('SW importScripts executed (hopefully)!');
 
 this.addEventListener('install', function(evt) {
@@ -31,7 +41,6 @@ this.onconnect = function(msg) {
   msg.acceptConnection(true);
   msg.source.onmessage = function(aMsg) {
     debug("SW Got a message from one of the accepted connections: " + JSON.stringify(aMsg));
-    // TO-DO HERE! ANSWER THE MESSAGE!
     msg.source.postMessage("Hello, client! I got your request: " + JSON.stringify(aMsg));
   };
 };
@@ -39,10 +48,15 @@ this.onconnect = function(msg) {
 this.addEventListener('message', function(evt) {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
   debug('SW onmessage ---> '+ JSON.stringify(evt.data));
+  // ADDED FOR SHIM
+  // Since we're using the same channel to process messages comming from the main
+  // thread of the app to the SW, and messages coming from the navigator.connect
+  // shim, we have to distinguish them here
   if (this.NCShim.isInternalMessage(evt)) {
     debug('SW es msg interno. no ejectuar esto');
     return;
   }
+  // END ADDED FOR SHIM
 
   // Your code here
   debug("SW We got a message for us!");
