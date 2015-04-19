@@ -30,7 +30,9 @@ this.onconnect = function(msg) {
   // so we can do:
   msg.acceptConnection(true);
   msg.source.onmessage = function(msg) {
-    debug("SW Got a message from one of the accepted connections!");
+    debug("SW Got a message from one of the accepted connections: " + JSON.stringify(msg));
+    // TO-DO HERE! ANSWER THE MESSAGE!
+    msg.source.postMessage("Hello, client! I got your request: " + JSON.stringify(msg));
   };
 };
 
