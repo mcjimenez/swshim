@@ -22,7 +22,7 @@ this.addEventListener('fetch', function(evt) {
 this.onconnect = function(msg) {
   debug("SW onconnect event");
   for(var i in msg){
-    debug(i+':'+msg[i]);
+    debug('SW --->' +i+':'+msg[i]);
   }
   debug("SW onconnect: We should have a port here on msg.source: " +
         JSON.stringify(msg.source));
@@ -36,7 +36,7 @@ this.onconnect = function(msg) {
 
 this.addEventListener('message', function(evt) {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
-  debug('SW onmessage ---> '+ JSON.stringify(evt));
+  debug('SW onmessage ---> '+ JSON.stringify(evt.data));
   if (this.NCShim.isInternalMessage(evt)) {
     debug('SW es msg interno. no ejectuar esto');
     return;

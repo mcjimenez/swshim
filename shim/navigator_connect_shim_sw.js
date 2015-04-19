@@ -27,7 +27,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   var _messageChannels = {};
 
   function sendMessage(msg) {
-    debug('SHIM SW Dentro sendMessage');
+    debug('SHIM SW Dentro sendMessage --> ' + JSON.stringify(msg));
 
     self.clients.matchAll().then(res => {
       if (!res.length) {
@@ -79,7 +79,8 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
         postMessage: msg => {
           // TO-DO/TO-DO: Either here or on sendMessage, we should have a way to
           // distinguish our internal messages. Worst case, we can use the uuid
-          // (if it has an uuid field and  a data field it's internal...
+          // (if it has an uuid field and a data field it's internal...
+          debug('connectionMessage.source.postMessage');
           sendMessage({uuid: evt.data.uuid, data: msg});
         }
       };
@@ -88,15 +89,17 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // accepted the connection:
       connectionMessage.acceptConnection = aPromise => {
         if (typeof aPromise.then !== 'function') {
-          debug('SHIM SW acceptConnection no recibida promesa');
+          debug('SHIM SW acceptConnection no recibida promesa -->'+JSON.stringify(aPromise));
           // We got a value instead of a promise...
           aPromise = Promise.resolve(aPromise);
         }
-        aPromise.then(accepted => sendMessage({ uuid: evt.data.uuid,
+        aPromise.then(accepted =>{
+              debug('CJC then de acceptConncetion accepted:'+accepted);
+                                  sendMessage({ uuid: evt.data.uuid,
                                                 data: {
                                                   accepted: accepted
                                                 }
-                                              }));
+                                              });});
       };
 
       // On this object the onconnect handler add an event listener/set a

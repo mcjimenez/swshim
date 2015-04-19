@@ -40,7 +40,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   }
 
   function sendMessageByIAC(evt) {
-    debug("SHIM SVR sendMessageByIAC");
+    debug("SHIM SVR sendMessageByIAC. " + JSON.stringify(evt.data));
     // evt.data.uuid has the uuid of the port we should use to send the data...
     portTable[evt.data.uuid] &&
       portTable[evt.data.uuid].postMessage(evt.data.data);
@@ -67,7 +67,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // false otherwise.
   var isConnectionRequest = function(message) {
     debug('SHIM SVR - isConnectionRequest:' + message.isConnectionRequest);
-    return message.isConnectionRequest;
+    return (message && message.isConnectionRequest ? true : false);
   };
 
   var getDefaultMsg = function() {
@@ -107,6 +107,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
           uuid: aMessage.uuid,
           dataToSend: aMessage.data
         };
+        debug('SHIM SVR --> msg creado:'+JSON.stringify(message));
         // This sends the message data as well as transferring
         // messageChannel.port2 to the service worker.
         // The service worker can then use the transferred port to reply via
