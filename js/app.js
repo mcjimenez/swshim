@@ -83,7 +83,8 @@ debug('APP carga app.js');
     var connBto = document.querySelector('#connMsgMto');
     regBto.addEventListener('click', register);
     unRegBto.addEventListener('click', unregister);
-    sendMessageBto.addEventListener('click', NCShim.sendMessage.bind(null, undefined));
+    sendMessageBto.addEventListener('click',
+      { appicon : 'app://sms.gaiamobile.org/style/icons/sms_126.png'});
   });
 
 })(self);

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "name": "SW - SHIM - SERVER",
   "description": "Service worker - shim testing",
-  "type": "trusted",
+  "type": "certified",
   "launch_path": "/swshim/index.html",
   "icons": {
     "16": "/swshim/style/icons/icon.png",
