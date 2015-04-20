@@ -6,7 +6,7 @@
   var resources = {};
 
   function debug(str) {
-    console.log("CJC -*-:" + str);
+    console.log('CJC -*-:' + str);
   }
 
   function getJSON(file, mozSystem) {
