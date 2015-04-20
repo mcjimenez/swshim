@@ -111,4 +111,4 @@
 
   exports.service =  service;
 
-})(window || self);
+})(self);
