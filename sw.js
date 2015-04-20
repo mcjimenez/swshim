@@ -12,7 +12,7 @@ function debug(str) {
 }
 
 // ADDED FOR SHIM: Import the shim script
-this.importScripts("/swshim/shim/navigator_connect_shim_sw.js");
+this.importScripts('/swshim/shim/navigator_connect_shim_sw.js');
 // END ADDED FOR SHIM
 
 debug('SW importScripts executed (hopefully)!');
@@ -30,11 +30,11 @@ this.addEventListener('fetch', function(evt) {
 });
 
 this.onconnect = function(msg) {
-  debug("SW onconnect event");
+  debug('SW onconnect event');
   for(var i in msg){
     debug('SW --->' +i+':'+msg[i]);
   }
-  debug("SW onconnect: We should have a port here on msg.source: " +
+  debug('SW onconnect: We should have a port here on msg.source: ' +
         JSON.stringify(msg.source));
   // msg.source should have the endpoint to send and receive messages,
   // so we can do:
