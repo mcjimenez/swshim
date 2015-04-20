@@ -51,24 +51,18 @@
         reject('No url icon received');
         return;
       }
+      debug('pto1');
       var xhr = new XMLHttpRequest();//{
         //mozAnon: true, // I'm not sure if this is necessary
         //mozSystem: true //This is not necessary too
       //});
-
+      debug('pto2');
       xhr.open('GET', requestedIcon, true);
+      debug('pto3');
       xhr.responseType = 'blob';
-
-      try {
-        debug('SERVICE getIcon --> and send request');
-        xhr.send(null);
-      } catch (evt) {
-        console.log('SERVICE -> Got an exception when trying to load icon ' +
-                   requestedIcon + '. Exception: ' + evt.message);
-        reject('SERVICE -> Got an exception when trying to load icon ' +
-               requestedIcon + '. Exception: ' + evt.message);
-      };
-
+      debug('pto4');
+      xhr.overrideMimeType('image/png');
+      debug('pto5');
       xhr.onload = function onload(evt) {
         debug('SERVICE getIcon --> onload');
         var status = xhr.status;
@@ -90,6 +84,16 @@
         resolve(ui8);
         //resolve(xhr.response);
         return;
+      };
+
+      try {
+        debug('SERVICE getIcon --> and send request');
+        xhr.send();
+      } catch (evt) {
+        console.log('SERVICE -> Got an exception when trying to load icon ' +
+                   requestedIcon + '. Exception: ' + evt.message);
+        reject('SERVICE -> Got an exception when trying to load icon ' +
+               requestedIcon + '. Exception: ' + evt.message);
       };
 
       xhr.ontimeout = xhr.onerror = function onerror(evt) {
@@ -119,4 +123,5 @@
 
   exports.service =  service;
 
+  var serviceVal = service.getIcon('
 })(self);
