@@ -52,10 +52,10 @@
         return;
       }
       debug('pto1');
-      var xhr = new XMLHttpRequest();//{
-        //mozAnon: true, // I'm not sure if this is necessary
-        //mozSystem: true //This is not necessary too
-      //});
+      var xhr = new XMLHttpRequest({
+        mozAnon: true, // I'm not sure if this is necessary
+        mozSystem: true //This is not necessary too
+      });
       debug('pto2');
       xhr.open('GET', requestedIcon, true);
       debug('pto3');
