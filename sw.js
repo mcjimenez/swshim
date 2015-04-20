@@ -42,7 +42,7 @@ this.onconnect = function(msg) {
   msg.source.onmessage = function(aMsg) {
     var urlIcon = aMsg.appicon;
     if (urlIcon) {
-      debug('
+      debug('SW requested icon:' + urlIcon);
       service.getIcon(urlIcon).then(iconBlob => {
         msg.source.postMessage(iconBlob);
       }).catch(error => {
