@@ -80,13 +80,15 @@
           return;
         }
 
-        var fr = new FileReader();
-        var iconBlob = xhr.response;
-        fr.onload = function(e) {
-          debug('SERVICE getIcon --> and resolve!!! guay :)');
-          resolve(fr.result);
-        };
-        fr.readAsDataURL(iconBlob);
+        var ui8 = new Uint8Array(xhr.response.length);
+
+        for (var i = 0, l = xhr.response.length; i < l; i++) {
+          ui8[i] = xhr.response.charCodeAt(i);
+        }
+
+        debug('SERVICE ui8:' + JSON.stringify(ui8));
+        resolve(ui8);
+        //resolve(xhr.response);
         return;
       };
 
