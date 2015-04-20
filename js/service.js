@@ -79,8 +79,14 @@
                  requestedIcon);
           return;
         }
-        debug('SERVICE getIcon --> and resolve!!! guay :)');
-        resolve(xhr.response);
+
+        var fr = new FileReader();
+        var iconBlob = xhr.response;
+        fr.onload = function(e) {
+          debug('SERVICE getIcon --> and resolve!!! guay :)');
+          resolve(fr.result);
+        };
+        fr.readAsDataURL(iconBlob);
         return;
       };
 
@@ -96,8 +102,8 @@
   function init() {
     debug('SERVICE init dentro');
     getJSON('/swshim/js/init.json').then(conf => {
-      console.log('CJC loaded init.json. url allowed:' + conf.alloweFrom);
-      urlAllowed = conf.alloweFrom;
+      console.log('CJC loaded init.json. url allowed:' + conf.allowedFrom);
+      urlAllowed = conf.allowedFrom;
       //TODO verified format
     });
   };
