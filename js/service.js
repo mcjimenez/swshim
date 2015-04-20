@@ -1,6 +1,6 @@
-'use strict';
-
 (function(exports) {
+
+  'use strict';
 
   var urlAllowed;
   var resources = {};
@@ -109,6 +109,6 @@
     getIcon: getIcon
   };
 
-  exports =  service;
+  exports.service =  service;
 
-})(window);
+})(window || self);
