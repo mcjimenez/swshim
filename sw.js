@@ -68,7 +68,7 @@ this.addEventListener('message', function(evt) {
     debug('SW es msg interno. no ejectuar esto');
     return;
   }
-  // END ADDED FOR SHIM
+  // END ADDED https://github.com/mcjimenez/swshimFOR SHIM
 
   // Your code here
   debug("SW We got a message for us!");
