@@ -19,7 +19,7 @@
         xhr = new XMLHttpRequest();
       }
       xhr.open('GET', file, true);
-      xhr.responseType = 'json';
+      //xhr.responseType = 'json';
       debug('SERVICE --> getJSON: creado XHR');
       xhr.onerror = function(error) {
         debug('SERVICE --> getJSON: xhr.error:' + error);
@@ -28,7 +28,7 @@
       xhr.onload = function() {
         if (xhr.response !== null) {
           debug('SERVICE --> getJSON: xhr.onload:' + JSON.stringify(xhr.response));
-          resolve(xhr.response);
+          resolve(xhr.responseText);
         } else {
           debug('SERVICE --> getJSON: xhr.response === null');
           reject(new Error('No valid JSON object was found (' +
