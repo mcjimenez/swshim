@@ -14,7 +14,7 @@
     return new Promise(function(resolve, reject) {
       var xhr;
       if (mozSystem) {
-        xhr = new XMLHttpRequest({mozSystem: true});
+        xhr = new XMLHttpRequest();//{mozSystem: true});
       } else {
         xhr = new XMLHttpRequest();
       }
