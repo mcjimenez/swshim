@@ -41,20 +41,20 @@
     });
   };
 
-  function getIcon(data, port) {
-    debug('SERVICE getIcon');
+  function getIcon(iconUrl) {
+    debug('SERVICE getIcon. ' + JSON.stringify(iconUrl));
     return new Promise((resolve, reject) => {
-      debug('SERVICE getIcon --> icon:' + data.appicon);
-      var requestedIcon = data.appicon; //resources [data.appicon];
+      debug('SERVICE getIcon --> icon:' + iconUrl);
+      var requestedIcon = iconUrl; //resources [data.appicon];
       if (!requestedIcon) {
         debug('SERVICE getIcon --> no icon requested');
         reject('No url icon received');
         return;
       }
-      var xhr = new XMLHttpRequest({
+      var xhr = new XMLHttpRequest();//{
         //mozAnon: true, // I'm not sure if this is necessary
         //mozSystem: true //This is not necessary too
-      });
+      //});
 
       xhr.open('GET', requestedIcon, true);
       xhr.responseType = 'blob';
