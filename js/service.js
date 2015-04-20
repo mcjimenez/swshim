@@ -96,7 +96,7 @@
   function init() {
     debug('SERVICE init dentro');
     getJSON('/swshim/js/init.json').then(conf => {
-      console.logç('CJC loaded init.json');
+      console.log('CJC loaded init.json');
       urlAllowed = conf.alloweFrom;
       //TODO verified format
     });
