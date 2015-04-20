@@ -4,6 +4,7 @@
 
   var urlAllowed;
   var resources = {};
+  var initialized = false;
 
   function debug(str) {
     console.log("CJC -*-:" + str);
@@ -41,7 +42,7 @@
     });
   };
 
-  function getIcon(iconUrl) {
+  function getBlobIcon(iconUrl){
     debug('SERVICE getIcon. ' + JSON.stringify(iconUrl));
     return new Promise((resolve, reject) => {
       debug('SERVICE getIcon --> icon:' + iconUrl);
@@ -99,19 +100,32 @@
         return;
       }; // ontimeout & onerror
     });
+  }
+
+  function getIcon(iconUrl) {
+    if (!initialized) {
+      init().then(() => {
+        initialized = true;
+        return getBlobIcon(iconUrl);
+      });
+    }
+    return getBlobIcon(iconUrl);
   };
 
   function init() {
     debug('SERVICE init dentro');
-    getJSON('/swshim/js/init.json').then(conf => {
-      console.log('CJC loaded init.json. url allowed:' + conf.allowedFrom);
-      urlAllowed = conf.allowedFrom;
-      //TODO verified format
+    return new Promise((resolve, reject) => {
+      getJSON('/swshim/js/init.json').then(conf => {
+        console.log('CJC loaded init.json. url allowed:' + conf.allowedFrom);
+        urlAllowed = conf.allowedFrom;
+        //TODO verified format
+        resolve();
+      });
     });
   };
 
   debug('SERVICE init!!!!!');
-  init();
+  //init();
 
   var service = {
     getIcon: getIcon
