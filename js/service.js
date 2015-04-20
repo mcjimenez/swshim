@@ -123,5 +123,4 @@
 
   exports.service =  service;
 
-  var serviceVal = service.getIcon('
 })(self);
