@@ -40,8 +40,20 @@ this.onconnect = function(msg) {
   // so we can do:
   msg.acceptConnection(true);
   msg.source.onmessage = function(aMsg) {
-    debug("SW Got a message from one of the accepted connections: " + JSON.stringify(aMsg));
-    msg.source.postMessage("Hello, client! I got your request: " + JSON.stringify(aMsg));
+    var urlIcon = aMsg.appicon;
+    if (urlIcon) {
+      debug('
+      service.getIcon(urlIcon).then(iconBlob => {
+        msg.source.postMessage(iconBlob);
+      }).catch(error => {
+        msg.source.postMessage(error);
+      });
+    } else {
+      debug('SW Got a message from one of the accepted connections: ' +
+            JSON.stringify(aMsg));
+      msg.source.postMessage('Hello, client! I got your request: ' +
+                             JSON.stringify(aMsg));
+    }
   };
 };
 
