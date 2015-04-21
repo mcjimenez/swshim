@@ -48,7 +48,6 @@ debug('APP carga app.js');
   };
 
   navigator.serviceWorker.addEventListener('message', evt => {
-  //window.addEventListener('message', function(evt) {
     // ADDED FOR SHIM
     // This is shim specific (and wouldn't be needed if navigator.connect were
     // native, or MessageChannel worked!). If we want to process messages that
@@ -61,14 +60,16 @@ debug('APP carga app.js');
     }
     // END ADDED FOR SHIM
 
+    // Your code here
+
     // from this point on, you would write your handler as if the shim weren't
     // present.
     debug('APP Msg recibido en app -->' + JSON.stringify(evt.data));
     var sett = evt.data.setting;
-    debug('APP --> we are going to request:' + sett);
     if (!sett) {
       // Return no setting msg
     }
+
     var _settings = navigator.mozSettings;
     _settings.createLock().get(sett).then(result => {
       debug('APP value: ' + result[sett] + ' send to sw');
