@@ -11,7 +11,6 @@ function debug(str) {
   // So if you just want to know that, search for:
   // ADDED FOR SHIM
 
-
   var register = function(evt) {
     debug('APP executing register...');
     navigator.serviceWorker.register('/swshim/sw.js', {scope: './'}
@@ -21,14 +20,14 @@ function debug(str) {
         debug('APP registration --> installing');
 	      // Reload document... (yep sucks!)
         // ADDED FOR SHIM: This is needed because the shim needs to have the
-        // SW ready to work, and that does not happen the first time it's installed
+        // SW ready to work, and that does not happen the first time it's
+        // installed
 	      location.reload();
         // END ADDED FOR SHIM
       } else if (reg.waiting) {
         debug('APP registration --> waiting');
       } else if (reg.active) {
         debug('APP registration --> active');
-        debug('APP setting client\'s msg handler');
       }
     }).catch(function(error) {
       debug('APP Registration failed with ' + error);
@@ -53,13 +52,12 @@ function debug(str) {
     // messages. So, dirty and quick:
     debug('APP --> msg received:' + JSON.stringify(evt.data));
     if (NCShim.isInternalMessage(evt)) {
-      debug(' SHIM SVR it\'s internal');
+      debug('SHIM SVR Msg is internal');
       return;
     }
     // END ADDED FOR SHIM
 
     // Your code here
-
     // from this point on, you would write your handler as if the shim weren't
     // present.
     var sett = evt.data.setting;
@@ -82,7 +80,7 @@ function debug(str) {
     debug('APP serviceWorker in navigator');
     register();
   } else {
-    debug('APP navigator has not ServiceWorker');
+    debug('APP navigator does not have ServiceWorker');
     return;
   }
 

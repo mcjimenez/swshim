@@ -60,13 +60,13 @@ this.addEventListener('message', evt => {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
   debug('SW onmessage ---> '+ JSON.stringify(evt.data));
   // ADDED FOR SHIM
-  // Since we're using the same channel to process messages comming from the main
-  // thread of the app to the SW, and messages coming from the navigator.connect
-  // shim, we have to distinguish them here
+  // Since we're using the same channel to process messages comming from the
+  // main thread of the app to the SW, and messages coming from the
+  // navigator.connect shim, we have to distinguish them here
   if (this.NCShim.isInternalMessage(evt)) {
     return;
   }
-  // END ADDED https://github.com/mcjimenez/swshimFOR SHIM
+  // END ADDED FOR SHIM
 
   // Your code here
   debug("SW We got a message for us!");
