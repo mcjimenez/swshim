@@ -53,7 +53,9 @@ debug('APP carga app.js');
     // native, or MessageChannel worked!). If we want to process messages that
     // come from our service worker, we need to ignore the shim internal
     // messages. So, dirty and quick:
+    debug('APP --> msg received:' + JSON.stringify(evt.data));
     if (NCShim.isInternalMessage(evt)) {
+      debug(' SHIM SVR it\'s internal');
       return;
     }
     // END ADDED FOR SHIM

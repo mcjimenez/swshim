@@ -55,7 +55,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
 
     debug('SHIM SVR registering a apps handlers');
     navigator.serviceWorker.addEventListener('message', evt => {
+      debug(' SHIM SVR  msg received:' + JSON.stringify(evt.data));
       if (!isInternalMessage(evt)) {
+        debug(' SHIM SVR it is not internal');
         return;
       }
       console.log('*** APP***  recibe un msg!!');
