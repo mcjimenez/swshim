@@ -13,7 +13,7 @@ function debug(str) {
 
 // ADDED FOR SHIM: Import the shim script
 this.importScripts('/swshim/shim/navigator_connect_shim_sw.js');
-this.importScripts('/swshim/js/service.js');
+//this.importScripts('/swshim/js/service.js');
 // END ADDED FOR SHIM
 
 debug('SW importScripts executed (hopefully)!');
@@ -41,13 +41,18 @@ this.onconnect = function(msg) {
   // so we can do:
   msg.acceptConnection(true);
   msg.source.onmessage = function(aMsg) {
-    var urlIcon = aMsg.appicon;
-    if (urlIcon) {
-      debug('SW requested icon:' + urlIcon);
-      service.getIcon(urlIcon).then(iconBlob => {
-        msg.source.postMessage(iconBlob);
-      }).catch(error => {
-        msg.source.postMessage(error);
+    debug('SW SETTING msg received:' + JSON.stringify(aMsg));
+    var setting = aMsg.setting;
+    if (setting) {
+      debug('SW SETTING requested setting:' + setting);
+      // In sw APIS do not work!!!! We need to request it to the main thread
+      self.clients.matchAll().then(res => {
+        if (!res.length) {
+          debug('SW SETTING Error: no clients are currently controlled.');
+        } else {
+          debug('SW SETTING Sending...');
+          res[0].postMessage({ 'setting': setting });
+        }
       });
     } else {
       debug('SW Got a message from one of the accepted connections: ' +
@@ -56,9 +61,10 @@ this.onconnect = function(msg) {
                              JSON.stringify(aMsg));
     }
   };
+  this.msgConnectionChannel = msg.source;
 };
 
-this.addEventListener('message', function(evt) {
+this.addEventListener('message', evt => {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
   debug('SW onmessage ---> '+ JSON.stringify(evt.data));
   // ADDED FOR SHIM
@@ -73,6 +79,7 @@ this.addEventListener('message', function(evt) {
 
   // Your code here
   debug("SW We got a message for us!");
+  this.msgConnectionChannel.postMessage(evt.data);
 });
 
 

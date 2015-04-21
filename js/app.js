@@ -60,10 +60,23 @@ debug('APP carga app.js');
 
     // from this point on, you would write your handler as if the shim weren't
     // present.
-    debug('APP Msg recibido en app');
+    debug('APP Msg recibido en app -->' + JSON.stringify(evt.data);
     for (var kk in evt) {
       debug('APP onMesssage -->:' + kk + ':' + JSON.stringify(evt[kk]));
     }
+    var sett = evt.data.setting;
+    debug('APP --> we are going to request:' + sett);
+    if (!sett) {
+      // Return no setting msg
+    }
+    var _settings = navigator.mozSettings;
+    _settings.createLock().get(sett).then(result => {
+      debug('APP value: ' + result[sett] + ' send to sw');
+      navigator.serviceWorker.ready.then(sw => {
+        sw.active && sw.active.postMessage({'setting': sett,
+                                            'value': result[sett]});
+      });
+    });
   });
 
   if ('serviceWorker' in navigator) {
