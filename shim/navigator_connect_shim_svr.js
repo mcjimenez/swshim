@@ -224,9 +224,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     };
   })();
 
-  debug('SHIM SVR antes registrar  handlers');
   navigator.serviceWorker.ready.then(registerHandlers);
-  debug('SHIM SVR despues registrar  handlers');
 
   // This whole object should not be needed, except for tests, if
   // MessageChannel did work.
