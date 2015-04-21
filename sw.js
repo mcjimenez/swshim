@@ -6,7 +6,6 @@
 // So if you just want to know that, search for:
 // ADDED FOR SHIM
 
-
 function debug(str) {
   console.log('CJC -*- -->' + str);
 }
@@ -14,8 +13,6 @@ function debug(str) {
 // ADDED FOR SHIM: Import the shim script
 this.importScripts('/swshim/shim/navigator_connect_shim_sw.js');
 // END ADDED FOR SHIM
-
-debug('SW importScripts executed (hopefully)!');
 
 this.addEventListener('install', function(evt) {
   debug('SW Install event');
@@ -67,7 +64,6 @@ this.addEventListener('message', evt => {
   // thread of the app to the SW, and messages coming from the navigator.connect
   // shim, we have to distinguish them here
   if (this.NCShim.isInternalMessage(evt)) {
-    debug('SW es msg interno. no ejectuar esto');
     return;
   }
   // END ADDED https://github.com/mcjimenez/swshimFOR SHIM

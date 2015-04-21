@@ -4,8 +4,6 @@ function debug(str) {
   console.log("CJC -*-:" + str);
 }
 
-debug('APP carga app.js');
-
 (function() {
   // This is a very basic sample app that uses a SW and acts as a server for
   // navigator.connect. I'm going to mark with a comment where the app MUST
@@ -64,10 +62,10 @@ debug('APP carga app.js');
 
     // from this point on, you would write your handler as if the shim weren't
     // present.
-    debug('APP Msg recibido en app -->' + JSON.stringify(evt.data));
     var sett = evt.data.setting;
     if (!sett) {
       // Return no setting msg
+      return;
     }
 
     var _settings = navigator.mozSettings;

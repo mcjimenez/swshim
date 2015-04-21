@@ -4,8 +4,6 @@ function debug(str) {
   console.log("CJC -*-:" + str);
 }
 
-debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
-
 (function(sw) {
   // It's not good trying to load this twice
   if (sw.NCShim) {
@@ -19,7 +17,6 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Messages that come from IAC should be marked somehow to distinguish them
   // from other messages the hosting app might want to pass.
   function isInternalMessage(aMessage) {
-    debug('SHIM SW IsInternalMessage:' + (aMessage && !!aMessage.data.isFromIAC));
     return !!(aMessage && aMessage.data && aMessage.data.isFromIAC);
   }
 
@@ -28,8 +25,6 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
   // Sends a message from the SW to the main thread. This would not be needed if
   // MessageChannel worked... Yep, you're going to read this a lot.
   function sendMessage(msg) {
-    debug('SHIM SW Dentro sendMessage --> ' + JSON.stringify(msg));
-
     self.clients.matchAll().then(res => {
       if (!res.length) {
         debug('SHIM SW Error: no clients are currently controlled.');
@@ -61,7 +56,7 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
 
     // Maybe we would need to do something with this...
     if (evt.data.isConnectionRequest) {
-      debug('SHIM SW - isConnectionRequest msg evt.data:'+JSON.stringify(evt.data));
+      debug('SHIM SW - isConnectionRequest msg:'+JSON.stringify(evt.data));
       var connectionMessage = evt.data.dataToSend || {};
       // We need to construct here what we will pass to onconnect, based on what
       // we have received onconnect will need a way to return data to the source
@@ -90,12 +85,11 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       // accepted the connection:
       connectionMessage.acceptConnection = aPromise => {
         if (typeof aPromise.then !== 'function') {
-          debug('SHIM SW acceptConnection no recibida promesa -->'+JSON.stringify(aPromise));
           // We got a value instead of a promise...
           aPromise = Promise.resolve(aPromise);
         }
         aPromise.then(accepted => {
-          debug('SHIM SW then for acceptConnection accepted:'+accepted);
+          debug('SHIM SW then for acceptConnection accepted:' + accepted);
           sendMessage({ uuid: evt.data.uuid,
                         data: {
                           accepted: accepted
@@ -118,10 +112,10 @@ debug('SHIM SW Self: ' + (self?'EXISTS':'DOES NOT EXIST'));
       _messageChannels[evt.data.uuid] = connectionMessage.source;
 
       if (sw.onconnect && typeof sw.onconnect == "function") {
-        debug('SHIM SW executing onConnect with --> ' + JSON.stringify(connectionMessage));
+        debug('SHIM SW executing onConnect with --> ' +
+              JSON.stringify(connectionMessage));
         sw.onconnect(connectionMessage);
       }
-
     } else {
       debug('SHIM SW - msg with isConnectionRequest false');
       // This should come from an accepted connection. So evt.data.uuid has the

@@ -4,8 +4,6 @@ function debug(str) {
   console.log("CJC -*- -->" + str);
 }
 
-debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
-
 (function(exports) {
 
   if (exports.NCShim) {
@@ -13,7 +11,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   }
 
   var cltCount = 0;
-  var ORIGN = 'clt';
 
   var connections = {};
   var handlerSet = false;
@@ -54,11 +51,9 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     navigator.serviceWorker.addEventListener('message', evt => {
       debug(' SHIM SVR  msg received:' + JSON.stringify(evt.data));
       if (!isInternalMessage(evt)) {
-        debug(' SHIM SVR it is not internal');
+        debug(' SHIM SVR msg is not internal');
         return;
       }
-      console.log('*** APP***  recibe un msg!!');
-      console.log('APP? Msg recibido en app --> ' + JSON.stringify(evt.data));
       // Here we have to pass this message to the other side of the
       // IAC connection...
       sendMessageByIAC(evt);
@@ -98,11 +93,10 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
   // originURL: The originator of the message
   var sendMessage = function(aMessage) {
     return new Promise((resolve, reject) => {
-      debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):'No'
-                                         + ' received msg to send'));
+      debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):
+                                         'No received msg to send'));
       navigator.serviceWorker.ready.then(sw => {
         debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
-        debug('SHIM SVR creating msg');
         // We must construct a structure here to indicate our sw partner that
         // we got a message and how to answer it.
         aMessage = aMessage || getDefaultMsg();
@@ -145,7 +139,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
     var started = false;
 
     function IAC() {
-      debug('SHIM - SVR --> fc IAC');
       this.connectionsURL = [];
 
       var request = navigator.mozApps.getSelf();
@@ -154,7 +147,7 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
         var app = domReq.target.result;
         var manifest  = app.manifest;
         if (!manifest || !manifest.connections) {
-          debug('SHIM SVR navigatorserver no tiene connections no poner listener');
+          debug('SHIM SVR manifest does not have connections defined');
           this.connectionsURL = [];
         }
         for (var key in manifest.connections) {
@@ -172,10 +165,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
       inProgress: false,
 
       onConnection: function (request) {
-      for(var kk in request) {
-      debug('SHIM svr reques onconnection:'+kk+':'+request[kk]); 
-      }
-        debug('SHIM SVR -NavigatorConnectServerIAC- onConnection -->');
         if (this.connectionsURL.indexOf(request.keyword) < 0) {
           debug('SHIM SVR no urls registered');
           return;
@@ -204,8 +193,6 @@ debug('SHIM SVR !! Loaded navigator_connect_shim_svr.js');
       },
 
       onmessage: function(uuid, originURL, evt) {
-        debug('SHIM SVR navigatorServer onmessage --> dentro: ' + uuid);
-
         sendMessage({ originURL: originURL,
                       data: evt.data,
                       uuid: uuid});
