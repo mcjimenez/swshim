@@ -18,7 +18,8 @@
   },
   "permissions": {
     "systemXHR": {},
-     "webapps-manage": {}
+    "webapps-manage": {},
+    "settings":{ "access": "readwrite" }
   },
   "installs_allowed_from": [
     "*"
