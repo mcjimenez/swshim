@@ -60,7 +60,7 @@ debug('APP carga app.js');
 
     // from this point on, you would write your handler as if the shim weren't
     // present.
-    debug('APP Msg recibido en app -->' + JSON.stringify(evt.data);
+    debug('APP Msg recibido en app -->' + JSON.stringify(evt.data));
     for (var kk in evt) {
       debug('APP onMesssage -->:' + kk + ':' + JSON.stringify(evt[kk]));
     }
