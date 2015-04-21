@@ -30,12 +30,8 @@ this.addEventListener('fetch', function(evt) {
 });
 
 this.onconnect = function(msg) {
-  debug('SW onconnect event');
-  for(var i in msg){
-    debug('SW --->' +i+':'+msg[i]);
-  }
-  debug('SW onconnect: We should have a port here on msg.source: ' +
-        JSON.stringify(msg.source));
+  debug('SW onconnect: We should have a port here on msg.source. ' +
+        (msg.source.postMessage ? 'yes!' : 'no :('));
   // msg.source should have the endpoint to send and receive messages,
   // so we can do:
   msg.acceptConnection(true);
