@@ -24,7 +24,7 @@ debug('APP carga app.js');
 	      // Reload document... (yep sucks!)
         // ADDED FOR SHIM: This is needed because the shim needs to have the
         // SW ready to work, and that does not happen the first time it's installed
-	      //location.reload();
+	      location.reload();
         // END ADDED FOR SHIM
       } else if (reg.waiting) {
         debug('APP registration --> waiting');
