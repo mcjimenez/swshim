@@ -125,6 +125,7 @@
                 // IAC connection...
                 sendMessageByIAC(aMessage.uuid, messageEvent.data);
               };
+              messageChannel.port1.onmessage(event);
             }
           }
         };
