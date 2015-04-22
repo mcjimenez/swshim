@@ -121,7 +121,10 @@
                 serverPort.postMessage(messageEvent.data);
               };
               // Set the event handler for response messages
-              serverPort.onmessage = evt => messageChannel.port1.postMessage(evt.data);
+              serverPort.onmessage = evt => {
+                debug('SHIM SVR serverPort.onmessage:' + JSON.stringify(evt.data));
+                messageChannel.port1.postMessage(evt.data);
+              };
               messageChannel.port1.onmessage(event);
             }
           }
