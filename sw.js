@@ -38,8 +38,8 @@ this.onconnect = function(msg) {
   // so we can do:
   msg.acceptConnection(true);
   msg.source.onmessage = function(aMsg) {
-    debug('SW SETTING msg received:' + JSON.stringify(aMsg));
-    var setting = aMsg.setting;
+    debug('SW SETTING msg received:' + JSON.stringify(aMsg.data));
+    var setting = aMsg.data.setting;
     if (setting) {
       debug('SW SETTING requested setting:' + setting);
       // In sw APIS do not work!!!! We need to request it to the main thread
