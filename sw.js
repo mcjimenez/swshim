@@ -48,7 +48,7 @@ this.onconnect = function(msg) {
       // do a reload, we'll work around this by making the main thread pass
       // us a MessageChannel to talk to it
       this.channelToMt.then(channel => {
-        channel.postMessage({'setting': setting});
+        channel.postMessage({ 'setting': setting });
       });
 
     } else {
@@ -61,7 +61,7 @@ this.onconnect = function(msg) {
   this.msgConnectionChannel = msg.source;
 };
 
-this.messageListener= evt => {
+this.messageListener = evt => {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
   debug('SW onmessage ---> '+ JSON.stringify(evt.data));
   // ADDED FOR SHIM
@@ -89,7 +89,7 @@ this.messageListener= evt => {
   // And I can remove the listener, I don't need this anymore
   this.removeEventListener('message', this.messageListener);
 
-});
+};
 
 this.addEventListener('message', this.messageListener);
 
