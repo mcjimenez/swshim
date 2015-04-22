@@ -1,13 +1,13 @@
 'use strict';
 
-function debug(str) {
-  console.log("CJC -*- -->" + str);
-}
-
 (function(exports) {
 
   if (exports.NCShim) {
     return;
+  }
+
+  function debug(str) {
+    console.log("CJC -*- -->" + str);
   }
 
   var cltCount = 0;
@@ -37,10 +37,10 @@ function debug(str) {
   // Sends a message received from the service worker to the client of the
   // connection using IAC as the transport mechanism
   function sendMessageByIAC(uuid, message) {
-    debug("SHIM SVR sendMessageByIAC. UUID:" + uuid + ", data: " + JSON.stringify(message));
+    debug("SHIM SVR sendMessageByIAC. UUID:" + uuid + ", data: " +
+          JSON.stringify(message));
     // evt.data.uuid has the uuid of the port we should use to send the data...
-    portTable[uuid] &&
-      portTable[uuid].postMessage(message);
+    portTable[uuid] && portTable[uuid].postMessage(message);
   }
 
   function registerHandlers() {
@@ -98,7 +98,7 @@ function debug(str) {
           dataToSend: aMessage.data
         };
 
-        debug('SHIM SVR --> msg creado:'+JSON.stringify(message));
+        debug('SHIM SVR --> msg created:'+JSON.stringify(message));
 
         // This should sends the message data as well as transferring
         // messageChannel.port2 to the service worker.
@@ -111,24 +111,24 @@ function debug(str) {
         messageChannel.port1.onmessage = function(event) {
           // We will get the answer for this communication here...
           if (event.data.error) {
-            debug("Got an error as a response: " + event.data.error);
+            debug("SHIM SVR Got an error as a response: " + event.data.error);
           } else {
-            // The first answer we will get is just the accept or reject, which we
-            // can use to remove this.
-            debug("Got an answer for the request!: " + JSON.stringify(event.data));
+            // The first answer we will get is just the accept or reject, which
+            // we can use to remove this.
+            debug("SHIM SVR Got an answer for the request!: " +
+                  JSON.stringify(event.data));
             // Here I have to check if the connection was accepted...
             if (event.data.accepted) {
               // And replace the event handler to process messages!
               messageChannel.port1.onmessage = function(messageEvent) {
-                // Here we have to pass this message to the other side of the IAC connection...
-                sendMessageByIAC(aMessage.uuid,messageEvent.data);
+                // Here we have to pass this message to the other side of the
+                // IAC connection...
+                sendMessageByIAC(aMessage.uuid, messageEvent.data);
               };
             }
           }
         };
 
-
-        // Unfortunately, that does not work on Gecko currently
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
         sw.active && sw.active.postMessage(message, [messageChannel.port2]);
         resolve(aMessage.uuid);

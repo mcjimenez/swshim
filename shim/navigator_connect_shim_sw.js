@@ -1,13 +1,14 @@
 'use strict';
 
-function debug(str) {
-  console.log("CJC -*-:" + str);
-}
-
 (function(sw) {
+
   // It's not good trying to load this twice
   if (sw.NCShim) {
     return;
+  }
+
+  function debug(str) {
+    console.log("CJC -*-:" + str);
   }
 
   var swCount = 0;
