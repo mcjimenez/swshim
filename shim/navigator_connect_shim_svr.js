@@ -123,6 +123,10 @@
               messageChannel.port1.onmessage = function(messageEvent) {
                 // Here we have to pass this message to the other side of the
                 // IAC connection...
+for (var i in messageEvent) {
+  debug('IAC-->'+ i+':'+ messageEvent[i]);
+}
+                debug('SHIM svr send By IAC:' + JSON.stringify(messageEvent.data));
                 sendMessageByIAC(aMessage.uuid, messageEvent.data);
               };
               messageChannel.port1.onmessage(event);
