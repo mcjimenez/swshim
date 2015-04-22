@@ -96,7 +96,7 @@
   }
 
   // Sends a message to the SW shim part. Note that this will be used only for connections
-  var sendMessage = function(aMessage) {
+  var sendConnectionMessage = function(aMessage) {
     return new Promise((resolve, reject) => {
       debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):
                                          'No received msg to send'));
@@ -132,7 +132,7 @@
                 // Here we have to pass this message to the other side of the
                 // IAC connection...
                 debug('SHIM svr send By IAC:' + JSON.stringify(messageEvent.data));
-                sendMessageByIAC(aMessage.uuid, messageEvent.data);
+                sendMessageByIAC(message.uuid, messageEvent.data);
               };
               messageChannel.port1.onmessage(event);
             }
@@ -191,9 +191,10 @@
           debug('SHIM SVR: 1st port.onmessage: ' + JSON.stringify(aMessage) +
                 ', ' + JSON.stringify(aMessage.data));
           var originURL = aMessage.data.originURL;
-          sendMessage({ isConnectionRequest: true,
-                        originURL: originURL,
-                        data: null}).then(connInfo => {
+          sendConnectionMessage({
+              isConnectionRequest: true,
+              originURL: originURL,
+              data: null}, port).then(connInfo => {
             debug('SHIM SVR sent connection message with uuid:' + connInfo.uuid);
             // TO-DO: This should be done only when the connection is actually
             // accepted. We don't want to send messages to the SW otherwise
@@ -226,7 +227,7 @@
   // Since it doesn't work for Service Workers, it's needed, sadly.
   exports.NCShim = {
     // sendMessage exported only for tests!
-    sendMessage: sendMessage
+    sendMessage: sendConnectionMessage
     // And this is needed only because MessageChannel doesn't currently work!
   };
 
