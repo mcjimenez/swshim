@@ -79,24 +79,31 @@
   //       new channel
   // and as a MANDATORY field:
   // originURL: The originator of the message
+  function getMessage(aMessage) {
+    // We must construct a structure here to indicate our sw partner that
+    // we got a message and how to answer it.
+    aMessage = aMessage || getDefaultMsg();
+    var uuid = aMessage.uuid || generateNewUUID();
+
+    return {
+      isFromIAC: true,
+      isConnectionRequest: isConnectionRequest(aMessage),
+      uuid: uuid,
+      originURL: aMessage.originURL,
+      dataToSend: aMessage.data
+    };
+
+  }
+
+  // Sends a message to the SW shim part. Note that this will be used only for connections
   var sendMessage = function(aMessage) {
     return new Promise((resolve, reject) => {
       debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):
                                          'No received msg to send'));
       navigator.serviceWorker.ready.then(sw => {
         debug('SHIM SVR Got regs: ' + JSON.stringify(sw));
-        // We must construct a structure here to indicate our sw partner that
-        // we got a message and how to answer it.
-        aMessage = aMessage || getDefaultMsg();
-        aMessage.uuid = aMessage.uuid || generateNewUUID();
 
-        var message = {
-          isFromIAC: true,
-          isConnectionRequest: isConnectionRequest(aMessage),
-          uuid: aMessage.uuid,
-          originURL: aMessage.originURL,
-          dataToSend: aMessage.data
-        };
+        var message = getMessage(aMessage);
 
         debug('SHIM SVR --> msg created:'+JSON.stringify(message));
 
@@ -107,6 +114,7 @@
         // messageChannel.port1.
         // See
         // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        // Create a new MessageChannel:
         var messageChannel = new MessageChannel();
         messageChannel.port1.onmessage = function(event) {
           // We will get the answer for this communication here...
@@ -133,7 +141,7 @@
 
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
         sw.active && sw.active.postMessage(message, [messageChannel.port2]);
-        resolve(aMessage.uuid);
+        resolve({uuid: message.uuid, channelPort: messageChannel.port1});
       });
     });
   };
@@ -185,22 +193,18 @@
           var originURL = aMessage.data.originURL;
           sendMessage({ isConnectionRequest: true,
                         originURL: originURL,
-                        data: null}).then(uuid => {
-            debug('SHIM SVR sent connection message with uuid:' + uuid);
+                        data: null}).then(connInfo => {
+            debug('SHIM SVR sent connection message with uuid:' + connInfo.uuid);
             // TO-DO: This should be done only when the connection is actually
             // accepted. We don't want to send messages to the SW otherwise
-            portTable[uuid] = port;
-            port.onmessage = this.onmessage.bind(this, uuid, originURL);
+            portTable[connInfo.uuid] = port;
+            // When we receive a message from the client shim we can pass it as is to the other side
+            port.onmessage = connInfo.channelPort.postMessage;
             port.start();
            });
         };
-      },
-
-      onmessage: function(uuid, originURL, evt) {
-        sendMessage({ originURL: originURL,
-                      data: evt.data,
-                      uuid: uuid});
       }
+
     };
 
     return {
