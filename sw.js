@@ -47,7 +47,7 @@ this.onconnect = function(msg) {
       // Since this doesn't work the first time, and we don't want to have to
       // do a reload, we'll work around this by making the main thread pass
       // us a MessageChannel to talk to it
-      this.channelToMt.then(channel => {
+      this.channelToMT.then(channel => {
         channel.postMessage({ 'setting': setting });
       });
 
