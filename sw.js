@@ -64,6 +64,7 @@ this.addEventListener('message', evt => {
   // main thread of the app to the SW, and messages coming from the
   // navigator.connect shim, we have to distinguish them here
   if (this.NCShim.isInternalMessage(evt)) {
+    debug('SW msg is internal, do not process');
     return;
   }
   // END ADDED FOR SHIM

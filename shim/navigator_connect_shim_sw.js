@@ -80,6 +80,7 @@
       debug('SHIM SW not an internal msg, ignoring');
       return;
     }
+    debug('SHIM SW msg 4 us');
     var data = transmitMessage(evt);
   });
 
