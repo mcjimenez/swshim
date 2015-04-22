@@ -26,6 +26,11 @@ this.addEventListener('fetch', function(evt) {
   debug('SW fetch event');
 });
 
+this.channelToMT = new Promise((resolve, reject) => {
+  this.resolveChannel = resolve;
+  this.rejectChannel = reject;
+});
+
 this.onconnect = function(msg) {
   debug('SW onconnect: We should have a port here on msg.source. ' +
         (msg.source.postMessage ? 'yes!' : 'no :('));
@@ -38,14 +43,14 @@ this.onconnect = function(msg) {
     if (setting) {
       debug('SW SETTING requested setting:' + setting);
       // In sw APIS do not work!!!! We need to request it to the main thread
-      self.clients.matchAll().then(res => {
-        if (!res.length) {
-          debug('SW SETTING Error: no clients are currently controlled.');
-        } else {
-          debug('SW SETTING Sending...');
-          res[0].postMessage({ 'setting': setting });
-        }
+
+      // Since this doesn't work the first time, and we don't want to have to
+      // do a reload, we'll work around this by making the main thread pass
+      // us a MessageChannel to talk to it
+      this.channelToMt.then(channel => {
+        channel.postMessage({'setting': setting});
       });
+
     } else {
       debug('SW Got a message from one of the accepted connections: ' +
             JSON.stringify(aMsg));
@@ -56,13 +61,15 @@ this.onconnect = function(msg) {
   this.msgConnectionChannel = msg.source;
 };
 
-this.addEventListener('message', evt => {
+this.messageListener= evt => {
   // This is a hack caused by the lack of dedicated MessageChannels... sorry!
   debug('SW onmessage ---> '+ JSON.stringify(evt.data));
   // ADDED FOR SHIM
   // Since we're using the same channel to process messages comming from the
   // main thread of the app to the SW, and messages coming from the
-  // navigator.connect shim, we have to distinguish them here
+  // navigator.connect shim, we have to distinguish them here. Sadly we can't
+  // remove this even if we have MessageChannels because we have to pass the
+  // MessageChannels down (connection messages) somehow.
   if (this.NCShim.isInternalMessage(evt)) {
     debug('SW msg is internal, do not process');
     return;
@@ -70,9 +77,19 @@ this.addEventListener('message', evt => {
   // END ADDED FOR SHIM
 
   // Your code here
-  debug("SW We got a message for us!");
-  this.msgConnectionChannel.postMessage(evt.data);
+  // The only message we should get here is a MessageChannel to talk back to
+  // the main thread... so...
+  if (evt.ports && evt.ports[0]) {
+    debug('Got a channel from the parent');
+    this.resolveChannel(evt.ports[0]);
+  } else {
+    debug('Did not got a channel!');
+    this.rejectChannel('I did not got a channel');
+  }
+  // And I can remove the listener, I don't need this anymore
+  this.removeEventListener('message', this.messageListener);
+
 });
 
-
+this.addEventListener('message', this.messageListener);
 

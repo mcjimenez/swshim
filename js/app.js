@@ -22,7 +22,7 @@ function debug(str) {
         // ADDED FOR SHIM: This is needed because the shim needs to have the
         // SW ready to work, and that does not happen the first time it's
         // installed
-	      location.reload();
+        //	      location.reload();
         // END ADDED FOR SHIM
       } else if (reg.waiting) {
         debug('APP registration --> waiting');
@@ -44,21 +44,9 @@ function debug(str) {
     });
   };
 
-  navigator.serviceWorker.addEventListener('message', evt => {
-    // ADDED FOR SHIM
-    // This is shim specific (and wouldn't be needed if navigator.connect were
-    // native, or MessageChannel worked!). If we want to process messages that
-    // come from our service worker, we need to ignore the shim internal
-    // messages. So, dirty and quick:
-    debug('APP --> msg received:' + JSON.stringify(evt.data));
-    if (NCShim.isInternalMessage(evt)) {
-      debug('SHIM SVR Msg is internal');
-      return;
-    }
-    // END ADDED FOR SHIM
-
+  var processSWRequest = function(channel, evt) {
     // Your code here
-    // from this point on, you would write your handler as if the shim weren't
+    // from this point on, you would write your handler as if the shim wasn't
     // present.
     var sett = evt.data.setting;
     if (!sett) {
@@ -69,16 +57,20 @@ function debug(str) {
     var _settings = navigator.mozSettings;
     _settings.createLock().get(sett).then(result => {
       debug('APP value: ' + result[sett] + ' send to sw');
-      navigator.serviceWorker.ready.then(sw => {
-        sw.active && sw.active.postMessage({'setting': sett,
-                                            'value': result[sett]});
-      });
+      channel.postMessage({'setting': sett,
+                           'value': result[sett]});
     });
-  });
+  };
 
   if ('serviceWorker' in navigator) {
     debug('APP serviceWorker in navigator');
     register();
+    navigator.serviceWorker.ready.then(sw => {
+      // Let's pass the SW some way to talk to us...
+      var mc = new MessageChannel();
+      mc.port1.onmessage = processSWRequest.bind(this, mc.port1);
+      sw.active && sw.active.postMessage({}, [mc.port2]);
+    });
   } else {
     debug('APP navigator does not have ServiceWorker');
     return;
