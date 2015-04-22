@@ -48,6 +48,10 @@ this.onconnect = function(msg) {
       // do a reload, we'll work around this by making the main thread pass
       // us a MessageChannel to talk to it
       this.channelToMT.then(channel => {
+        // This has a problem... we can't queue messages
+        channel.onmessage = evt => {
+          msg.source.postMessage({setting: setting, value: evt.data});
+        };
         channel.postMessage({ 'setting': setting });
       });
 
@@ -58,7 +62,6 @@ this.onconnect = function(msg) {
                              JSON.stringify(aMsg.data));
     }
   };
-  this.msgConnectionChannel = msg.source;
 };
 
 this.messageListener = evt => {
