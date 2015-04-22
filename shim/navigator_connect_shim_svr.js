@@ -36,28 +36,16 @@ function debug(str) {
 
   // Sends a message received from the service worker to the client of the
   // connection using IAC as the transport mechanism
-  function sendMessageByIAC(evt) {
-    debug("SHIM SVR sendMessageByIAC. " + JSON.stringify(evt.data));
+  function sendMessageByIAC(uuid, message) {
+    debug("SHIM SVR sendMessageByIAC. UUID:" + uuid + ", data: " + JSON.stringify(message));
     // evt.data.uuid has the uuid of the port we should use to send the data...
-    portTable[evt.data.uuid] &&
-      portTable[evt.data.uuid].postMessage(evt.data.data);
+    portTable[uuid] &&
+      portTable[uuid].postMessage(message);
   }
 
   function registerHandlers() {
     debug('SHIM SVR -- registerHandlers');
     NavigatorConnectServerIAC.start();
-
-    debug('SHIM SVR registering a apps handlers');
-    navigator.serviceWorker.addEventListener('message', evt => {
-      debug(' SHIM SVR  msg received:' + JSON.stringify(evt.data));
-      if (!isInternalMessage(evt)) {
-        debug(' SHIM SVR msg is not internal');
-        return;
-      }
-      // Here we have to pass this message to the other side of the
-      // IAC connection...
-      sendMessageByIAC(evt);
-    });
   }
 
   // Returns true if the message (from IAC) is a connection request,
@@ -119,19 +107,33 @@ function debug(str) {
         // messageChannel.port1.
         // See
         // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+        var messageChannel = new MessageChannel();
+        messageChannel.port1.onmessage = function(event) {
+          // We will get the answer for this communication here...
+          if (event.data.error) {
+            debug("Got an error as a response: " + event.data.error);
+          } else {
+            // The first answer we will get is just the accept or reject, which we
+            // can use to remove this.
+            debug("Got an answer for the request!: " + JSON.stringify(event.data));
+            // Here I have to check if the connection was accepted...
+            if (event.data.accepted) {
+              // And replace the event handler to process messages!
+              messageChannel.port1.onmessage = function(messageEvent) {
+                // Here we have to pass this message to the other side of the IAC connection...
+                sendMessageByIAC(aMessage.uuid,messageEvent.data);
+              };
+            }
+          }
+        };
+
+
         // Unfortunately, that does not work on Gecko currently
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
-        sw.active && sw.active.postMessage(message);
+        sw.active && sw.active.postMessage(message, [messageChannel.port2]);
         resolve(aMessage.uuid);
       });
     });
-  };
-
-  // Distinguish when a message from the SW is internal of
-  // navigator.connect or not. Currently we just check if the message includes
-  // an uuid or not.
-  function isInternalMessage(evt) {
-    return evt.data.uuid;
   };
 
   // Create a listener service for the IAC messages.
@@ -218,9 +220,8 @@ function debug(str) {
   // Since it doesn't work for Service Workers, it's needed, sadly.
   exports.NCShim = {
     // sendMessage exported only for tests!
-    sendMessage: sendMessage,
+    sendMessage: sendMessage
     // And this is needed only because MessageChannel doesn't currently work!
-    isInternalMessage: isInternalMessage
   };
 
 })(window);
