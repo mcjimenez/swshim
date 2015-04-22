@@ -15,11 +15,6 @@
   var connections = {};
   var handlerSet = false;
 
-  // To store the list of ports we've accepted... Note that at this point we're
-  // not multiplexing navigator.connect connections over IAC connections
-  // Although we could do that also.
-  var portTable = {};
-
   // Generates an UUID. This function is not cryptographically robust, but at
   // this moment this doesn't matter that much.
   function generateNewUUID() {
@@ -32,15 +27,6 @@
     });
     debug('SHIM SVR generateNewUUID(): ' + uuid);
     return uuid;
-  }
-
-  // Sends a message received from the service worker to the client of the
-  // connection using IAC as the transport mechanism
-  function sendMessageByIAC(uuid, message) {
-    debug("SHIM SVR sendMessageByIAC. UUID:" + uuid + ", data: " +
-          JSON.stringify(message));
-    // evt.data.uuid has the uuid of the port we should use to send the data...
-    portTable[uuid] && portTable[uuid].postMessage(message);
   }
 
   function registerHandlers() {
@@ -96,7 +82,7 @@
   }
 
   // Sends a message to the SW shim part. Note that this will be used only for connections
-  var sendConnectionMessage = function(aMessage) {
+  var sendConnectionMessage = function(aMessage, serverPort) {
     return new Promise((resolve, reject) => {
       debug('SHIM SVR sendMessage...' + (aMessage ? JSON.stringify(aMessage):
                                          'No received msg to send'));
@@ -132,8 +118,10 @@
                 // Here we have to pass this message to the other side of the
                 // IAC connection...
                 debug('SHIM svr send By IAC:' + JSON.stringify(messageEvent.data));
-                sendMessageByIAC(message.uuid, messageEvent.data);
+                serverPort.postMessage(messageEvent.data);
               };
+              // Set the event handler for response messages
+              serverPort.onmessage = evt => messageChannel.port1.postMessage(evt.data);
               messageChannel.port1.onmessage(event);
             }
           }
@@ -141,7 +129,8 @@
 
         debug('SHIM SVR sending message ' + (sw.active?' sw active':'sw NO active'));
         sw.active && sw.active.postMessage(message, [messageChannel.port2]);
-        resolve({uuid: message.uuid, channelPort: messageChannel.port1});
+        // We could probably do this earlier...
+        serverPort.start();
       });
     });
   };
@@ -194,15 +183,7 @@
           sendConnectionMessage({
               isConnectionRequest: true,
               originURL: originURL,
-              data: null}, port).then(connInfo => {
-            debug('SHIM SVR sent connection message with uuid:' + connInfo.uuid);
-            // TO-DO: This should be done only when the connection is actually
-            // accepted. We don't want to send messages to the SW otherwise
-            portTable[connInfo.uuid] = port;
-            // When we receive a message from the client shim we can pass it as is to the other side
-            port.onmessage = connInfo.channelPort.postMessage;
-            port.start();
-           });
+              data: null}, port);
         };
       }
 
