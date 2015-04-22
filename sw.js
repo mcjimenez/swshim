@@ -50,7 +50,7 @@ this.onconnect = function(msg) {
       this.channelToMT.then(channel => {
         // This has a problem... we can't queue messages
         channel.onmessage = evt => {
-          msg.source.postMessage({setting: setting, value: evt.data});
+          msg.source.postMessage(evt.data);
         };
         channel.postMessage({ 'setting': setting });
       });
