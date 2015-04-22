@@ -53,9 +53,9 @@ this.onconnect = function(msg) {
 
     } else {
       debug('SW Got a message from one of the accepted connections: ' +
-            JSON.stringify(aMsg));
+            JSON.stringify(aMsg.data));
       msg.source.postMessage('Hello, client! I got your request: ' +
-                             JSON.stringify(aMsg));
+                             JSON.stringify(aMsg.data));
     }
   };
   this.msgConnectionChannel = msg.source;
